@@ -19,6 +19,13 @@ data class User (
         this.email = email
     }
 
+    fun getPass(): String {
+        return this.pass
+    }
+    fun setPass(pass: String) {
+        this.pass = pass
+    }
+
     override fun toString(): String {
         return "Username: ${this.getUsername()}\nEmail: ${this.getEmail()}\n"
     }

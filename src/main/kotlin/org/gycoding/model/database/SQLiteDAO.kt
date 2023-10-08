@@ -2,7 +2,11 @@ package org.gycoding.model.database
 
 import org.gycoding.model.data.Email
 import org.gycoding.model.data.User
+import org.gycoding.model.utils.PBKDF2
 import java.io.IOException
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.sql.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -114,5 +118,21 @@ class SQLiteDAO() : DBDAO {
         } catch(e: Exception) {
             throw e
         }
+    }
+
+    override public fun insertUser(user: User) {
+        val QUERY_INSERT_USER: String = "INSERT INTO Users VALUES (\"${user.getUsername()}\", \"${user.getEmail()}\", \"${user.getPass()}\")"
+
+        executeInsert(QUERY_INSERT_USER)
+    }
+
+    override fun updateUserPassword(user: User, pass: String) {
+        val QUERY_INSERT_USER: String = ""
+
+        executeInsert(QUERY_INSERT_USER)
+    }
+
+    override fun updateUserEmail(user: User, email: Email) {
+        TODO("Not yet implemented")
     }
 }
