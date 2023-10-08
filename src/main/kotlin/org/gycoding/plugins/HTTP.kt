@@ -1,4 +1,4 @@
-package org.gycoding.view.plugins
+package org.gycoding.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*
