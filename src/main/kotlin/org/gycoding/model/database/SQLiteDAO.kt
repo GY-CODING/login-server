@@ -1,7 +1,6 @@
 package org.gycoding.model.database
 
 import io.ktor.server.plugins.*
-import io.ktor.utils.io.charsets.Charset
 import org.gycoding.model.data.Email
 import org.gycoding.model.data.User
 import org.gycoding.model.utils.Cipher
@@ -9,9 +8,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.math.BigInteger
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.sql.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -20,8 +16,9 @@ class SQLiteDAO() : DBDAO {
     private var conn: Connection? = null
 
     companion object {
-        private val STATE_ERROR: Int = -1;
-        private val STATE_SUCCESS: Int = 0;
+        private val STATE_ERROR_USERNAME: Int   = -2;
+        private val STATE_ERROR_EMAIL: Int      = -1;
+        private val STATE_SUCCESS: Int          = 0;
     }
 
     init {
@@ -29,9 +26,14 @@ class SQLiteDAO() : DBDAO {
         conn = connect()
     }
 
+
+
+    /* ================# PRIVATE FUNCTIONS #================ */
+
     /**
-     * Establece la conexión a la base de datos.
-     * @return Objeto de conexión.
+     * Connects to a database.
+     * @return Connection instance.
+     * @see Connection
      */
     fun connect(): Connection? {
         val URL                 = "jdbc:sqlite:identifier.db"
@@ -52,9 +54,10 @@ class SQLiteDAO() : DBDAO {
      * @param script SQL script.
      * @return List of all the individual sentences from the script.
      * @throws IOException
+     * @see MutableList
      */
     @Throws(IOException::class)
-    private fun processSQL(script: String): List<String> {
+    private fun processSQL(script: String): MutableList<String> {
         var script = script
         val SQL_DELIM = ";"
         val scripts: MutableList<String> = ArrayList()
@@ -69,8 +72,8 @@ class SQLiteDAO() : DBDAO {
     }
 
     /**
-     * Ejecuta una sentencia DML de inserción de datos de SQL.
-     * @param sql Sentencia individual de SQL.
+     * Executes a DML sentence of insert to the SQL database.
+     * @param sql SQL sentence (scripts are not allowed).
      * @throws SQLException
      */
     @Throws(SQLException::class)
@@ -83,6 +86,16 @@ class SQLiteDAO() : DBDAO {
         ps.close()
     }
 
+    /**
+     * Executes a DML sentence of insert to the SQL database,
+     * where the data is specifically thought to be a hashed password and its salt.
+     * @param sql SQL sentence (scripts are not allowed).
+     * @param pass Hashed password.
+     * @param salt User associated salt.
+     * @throws SQLException
+     * @see ByteArray
+     */
+    @Throws(SQLException::class)
     private fun executeByteInsert(sql: String, pass: ByteArray, salt: ByteArray) {
         val ps: PreparedStatement = conn!!.prepareStatement(sql)
 
@@ -94,8 +107,8 @@ class SQLiteDAO() : DBDAO {
     }
 
     /**
-     * Ejecuta una sentencia DML de actualización de datos de SQL.
-     * @param sql Sentencia individual de SQL.
+     * Executes a DML sentence of update to the SQL database.
+     * @param sql SQL sentence (scripts are not allowed).
      * @throws SQLException
      */
     @Throws(SQLException::class)
@@ -106,9 +119,9 @@ class SQLiteDAO() : DBDAO {
     }
 
     /**
-     * Ejecuta una selección SQL.
-     * @param sql Sentencia individual de SQL.
-     * @return
+     * Executes a query selection from the SQL database.
+     * @param sql SQL sentence (scripts are not allowed).
+     * @return Set of results given by the query selection.
      * @throws SQLException
      * @see ResultSet
      */
@@ -118,10 +131,35 @@ class SQLiteDAO() : DBDAO {
         return ps.executeQuery()
     }
 
+    /**
+     * Reads byte data from the SQL database.
+     * @param rs Set of results from a query selection to the SQL database.
+     * @param column SQL database column which data will be read.
+     * @return A byte array of al the data read.
+     * @see ByteArray
+     * @see ResultSet
+     * @see ByteArrayOutputStream
+     */
+    private fun readBytes(rs: ResultSet, column: String): ByteArray {
+        val inputStream: InputStream    = rs.getBinaryStream(column)
+        val outputStream                = ByteArrayOutputStream()
+        val buffer                      = ByteArray(4096)
+        var bytesRead: Int
 
+        while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+            outputStream.write(buffer, 0, bytesRead)
+        }
 
+        return outputStream.toByteArray()
+    }
 
-
+    /**
+     * Returns a user instance conditioned by the username given as parameter.
+     * @param username Username over which the query sleection will be executed, returning the user instance of it.
+     * @return User instance
+     * @throws NotFoundException
+     * @see User
+     */
     @Throws(NotFoundException::class)
     private fun getUser(username: String): User {
         val QUERY_USER: String = "SELECT username, email, password, salt FROM Users WHERE username = \"${username}\""
@@ -130,27 +168,8 @@ class SQLiteDAO() : DBDAO {
             val rs: ResultSet = this.executeQuery(QUERY_USER)
             var user = User(rs.getString("username"), Email(rs.getString("email")))
 
-            val inputStreamPass: InputStream = rs.getBinaryStream("password")
-            val inputStreamSalt: InputStream = rs.getBinaryStream("salt")
-
-            val outputStreamPass = ByteArrayOutputStream()
-            val outputStreamSalt = ByteArrayOutputStream()
-
-            val buffer = ByteArray(4096)
-
-            var bytesReadPass: Int
-            var bytesReadSalt: Int
-
-            while (inputStreamPass.read(buffer).also { bytesReadPass = it } != -1) {
-                outputStreamPass.write(buffer, 0, bytesReadPass)
-            }
-
-            while (inputStreamSalt.read(buffer).also { bytesReadSalt = it } != -1) {
-                outputStreamSalt.write(buffer, 0, bytesReadSalt)
-            }
-
-            user.setPass(outputStreamPass.toByteArray())
-            user.setSalt(outputStreamSalt.toByteArray())
+            user.setPass(readBytes(rs, "password"))
+            user.setSalt(readBytes(rs, "salt"))
 
             return user
         } catch(e: NullPointerException) {
@@ -158,6 +177,13 @@ class SQLiteDAO() : DBDAO {
         }
     }
 
+    /**
+     * Returns a user instance condition by the email given as parameter.
+     * @param email Email over which the query sleection will be executed, returning the user instance of it (any service is allowed).
+     * @return User instance
+     * @throws NotFoundException
+     * @see User
+     */
     @Throws(NotFoundException::class)
     private fun getUser(email: Email): User {
         val QUERY_USER: String = "SELECT username, email, password, salt FROM Users WHERE email = \"${email}\""
@@ -166,8 +192,8 @@ class SQLiteDAO() : DBDAO {
             val rs: ResultSet = this.executeQuery(QUERY_USER)
             var user = User(rs.getString("username"), Email(rs.getString("email")))
 
-            user.setPass(rs.getString("password").toByteArray(Charsets.UTF_8))
-            user.setSalt(rs.getString("salt").toByteArray(Charsets.UTF_8))
+            user.setPass(readBytes(rs, "password"))
+            user.setSalt(readBytes(rs, "salt"))
 
             return user
         } catch(e: NullPointerException) {
@@ -177,7 +203,7 @@ class SQLiteDAO() : DBDAO {
 
 
 
-
+    /* ================# PUBLIC FUNCTIONS #================ */
 
     override public fun checkLogin(user: String, pass: String): Boolean {
         val user: User = this.getUser(user)
@@ -192,7 +218,6 @@ class SQLiteDAO() : DBDAO {
 
     @Throws(SQLException::class)
     override public fun signUp(user: User, pass: String): Int {
-        var state: Int                  = -1;
         var salt: ByteArray             = Cipher.generateSalt()
 
         val QUERY_INSERT_USER: String   =
@@ -203,23 +228,33 @@ class SQLiteDAO() : DBDAO {
                     "?" +
             ")"
 
-        state = try {
+        return try {
             executeByteInsert(QUERY_INSERT_USER, Cipher.hashPassword(pass, salt), salt)
             STATE_SUCCESS
         } catch(e: SQLException) {
-            STATE_ERROR
+            STATE_ERROR_EMAIL
         }
-
-        return state
     }
 
+    @Throws(SQLException::class)
     override fun updateUserPassword(user: User, pass: String) {
-        val QUERY_INSERT_USER: String = ""
+        val QUERY_UPDATE_PASSWORD: String = "UPDATE Users SET password = \"${pass}\" WHERE username = \"${user.getUsername()}\""
 
-        executeInsert(QUERY_INSERT_USER)
+        try {
+            executeUpdate(QUERY_UPDATE_PASSWORD)
+        } catch(e: SQLException) {
+            throw e
+        }
     }
 
+    @Throws(SQLException::class)
     override fun updateUserEmail(user: User, email: Email) {
-        TODO("Not yet implemented")
+        val QUERY_UPDATE_EMAIL: String = "UPDATE Users SET email = \"${email}\" WHERE username = \"${user.getUsername()}\""
+
+        try {
+            executeUpdate(QUERY_UPDATE_EMAIL)
+        } catch(e: SQLException) {
+            throw e
+        }
     }
 }
