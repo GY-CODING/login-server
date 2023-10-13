@@ -16,9 +16,11 @@ class SQLiteDAO() : DBDAO {
     private var conn: Connection? = null
 
     companion object {
-        private val STATE_ERROR_USERNAME: Int   = -2;
-        private val STATE_ERROR_EMAIL: Int      = -1;
-        private val STATE_SUCCESS: Int          = 0;
+        val STATE_ERROR_USERNAME: Int   = -3;
+        val STATE_ERROR_EMAIL: Int      = -2;
+        val STATE_ERROR_PASSWORD: Int   = -1;
+        val STATE_ERROR_DATABASE: Int   = 0;
+        val STATE_SUCCESS: Int          = 1;
     }
 
     init {
@@ -212,49 +214,58 @@ class SQLiteDAO() : DBDAO {
 
     override public fun checkLogin(email: Email, pass: String): Boolean {
         val user: User = this.getUser(email)
-
         return Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
     }
 
     @Throws(SQLException::class)
     override public fun signUp(user: User, pass: String): Int {
-        var salt: ByteArray             = Cipher.generateSalt()
-
-        val QUERY_INSERT_USER: String   =
-            "INSERT INTO Users VALUES (" +
-                    "\"${user.getUsername()}\"," +
-                    "\"${user.getEmail()}\"," +
-                    "?," +
-                    "?" +
-            ")"
+        var salt: ByteArray = Cipher.generateSalt()
 
         return try {
-            executeByteInsert(QUERY_INSERT_USER, Cipher.hashPassword(pass, salt), salt)
-            STATE_SUCCESS
-        } catch(e: SQLException) {
-            STATE_ERROR_EMAIL
+            getUser(user.getUsername())
+            STATE_ERROR_USERNAME
+        } catch(e: NotFoundException) {
+            return try {
+                getUser(user.getEmail())
+                STATE_ERROR_EMAIL
+            } catch(e: NotFoundException) {
+                val QUERY_INSERT_USER: String = "INSERT INTO Users VALUES (\"${user.getUsername()}\", \"${user.getEmail()}\", ?, ?)"
+
+                return try {
+                    executeByteInsert(QUERY_INSERT_USER, Cipher.hashPassword(pass, salt), salt)
+                    STATE_SUCCESS
+                } catch(e: SQLException) {
+                    STATE_ERROR_DATABASE
+                }
+            }
         }
     }
 
     @Throws(SQLException::class)
-    override fun updateUserPassword(user: User, pass: String) {
-        val QUERY_UPDATE_PASSWORD: String = "UPDATE Users SET password = \"${pass}\" WHERE username = \"${user.getUsername()}\""
+    override fun updateUserPassword(user: User, oldPass: String, newPass: String): Int {
+        val QUERY_UPDATE_PASSWORD: String = "UPDATE Users SET password = \"${Cipher.hashPassword(newPass, user.getSalt())}\" WHERE username = \"${user.getUsername()}\""
 
-        try {
-            executeUpdate(QUERY_UPDATE_PASSWORD)
+        return try {
+            if(Cipher.verifyPassword(oldPass, user.getSalt(), user.getPass())) {
+                executeUpdate(QUERY_UPDATE_PASSWORD)
+                STATE_SUCCESS;
+            } else {
+                STATE_ERROR_PASSWORD
+            }
         } catch(e: SQLException) {
-            throw e
+            STATE_ERROR_DATABASE
         }
     }
 
     @Throws(SQLException::class)
-    override fun updateUserEmail(user: User, email: Email) {
+    override fun updateUserEmail(user: User, email: Email): Int {
         val QUERY_UPDATE_EMAIL: String = "UPDATE Users SET email = \"${email}\" WHERE username = \"${user.getUsername()}\""
 
-        try {
+        return try {
             executeUpdate(QUERY_UPDATE_EMAIL)
+            STATE_SUCCESS
         } catch(e: SQLException) {
-            throw e
+            STATE_ERROR_DATABASE
         }
     }
 }
