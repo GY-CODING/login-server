@@ -6,6 +6,7 @@ class Email(
     private var stringifiedEmail: String,
 ) {
     companion object {
+        public val REGEX: Regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$".toRegex()
         private val MAIL_DELIM: String = "@"
     }
 

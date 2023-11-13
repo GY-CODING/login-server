@@ -18,25 +18,14 @@ fun Application.configureRouting() {
     var passTemp: String            = ""
 
     routing {
-        /*
-        get("/user/{user}") {
-            try {
-                call.respondText(appController.getUser(call.parameters["user"]!!).toJSON())
-            } catch(e: NotFoundException) {
-                call.respond(HttpStatusCode.NotFound, e.message.toString())
-            }
-        }
-        get("/user/{email}") {
-            try {
-                call.respondText(appController.getUser(Email(call.parameters["email"]!!)).toJSON())
-            } catch(e: NotFoundException) {
-                call.respond(HttpStatusCode.NotFound, e.message.toString())
-            }
-        }
-        */
         get("/login/{user}/{password}") {
             try {
-                call.respondText(appController.checkLogin(call.parameters["user"]!!, call.parameters["password"]!!).toString())
+                if(call.parameters["user"]!!.matches(Email.REGEX)) {
+                    call.respondText(appController.checkLogin(Email(call.parameters["user"]!!), call.parameters["password"]!!).toString())
+                } else {
+                    call.respondText(appController.checkLogin(call.parameters["user"]!!, call.parameters["password"]!!).toString())
+                }
+
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
