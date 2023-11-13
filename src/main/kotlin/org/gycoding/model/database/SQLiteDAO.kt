@@ -38,7 +38,7 @@ class SQLiteDAO() : DBDAO {
      * @see Connection
      */
     fun connect(): Connection? {
-        val URL                 = "jdbc:sqlite:identifier.db"
+        val URL                 = "jdbc:sqlite:accounts.db"
         val CONNECTION_SUCCESS  = "Connection set successfuly."
 
         return try {
