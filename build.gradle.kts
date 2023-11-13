@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -9,17 +11,32 @@ plugins {
 }
 
 group = "org.gycoding"
-version = "0.0.1"
+version = "1.0.0"
 
 application {
     mainClass.set("org.gycoding.ApplicationKt")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 repositories {
     mavenCentral()
+}
+
+ktor {
+    fatJar {
+        archiveFileName.set("GYServer.jar")
+    }
+    docker {
+        jreVersion.set(JavaVersion.VERSION_11)
+        localImageName.set("GYServer")
+        imageTag.set("v1.0.0")
+        /*externalRegistry.set(
+            io.ktor.plugin.features.DockerImageRegistry.dockerHub(
+                appName = provider { "ktor-app" },
+                username = providers.environmentVariable("DOCKER_HUB_USERNAME"),
+                password = providers.environmentVariable("DOCKER_HUB_PASSWORD")
+            )
+        )*/
+    }
 }
 
 dependencies {
