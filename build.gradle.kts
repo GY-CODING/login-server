@@ -21,6 +21,11 @@ repositories {
     mavenCentral()
 }
 
+tasks.jar {
+    from("/accounts.db")
+}
+
+
 ktor {
     fatJar {
         archiveFileName.set("GYServer.jar")
