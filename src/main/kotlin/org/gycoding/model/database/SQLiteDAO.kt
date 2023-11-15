@@ -60,11 +60,10 @@ class SQLiteDAO() : DBDAO {
      */
     @Throws(IOException::class)
     private fun processSQL(script: String): MutableList<String> {
-        var script = script
+        var scriptFormatted = script.replace("\\s".toRegex(), " ")
         val SQL_DELIM = ";"
         val scripts: MutableList<String> = ArrayList()
-        script = script.replace("\\s".toRegex(), " ")
-        val st = StringTokenizer(script, SQL_DELIM)
+        val st = StringTokenizer(scriptFormatted, SQL_DELIM)
 
         while (st.hasMoreTokens()) {
             scripts.add(st.nextToken())
@@ -207,8 +206,8 @@ class SQLiteDAO() : DBDAO {
 
     /* ================# PUBLIC FUNCTIONS #================ */
 
-    override public fun checkLogin(user: String, pass: String): Boolean {
-        val user: User = this.getUser(user)
+    override public fun checkLogin(username: String, pass: String): Boolean {
+        val user: User = this.getUser(username)
         return Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
     }
 

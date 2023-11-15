@@ -4,8 +4,13 @@ data class User (
     private var username: String,
     private var email: Email,
 ) {
-    private var pass: ByteArray? = null
-    private var salt: ByteArray? = null
+    companion object {
+        public val DEFAULT_ROLE: String    = "user"
+    }
+    
+    private var pass: ByteArray?        = null
+    private var salt: ByteArray?        = null
+    private var role: String            = DEFAULT_ROLE
 
     fun getUsername(): String {
         return this.username
@@ -35,11 +40,18 @@ data class User (
         this.salt = salt
     }
 
+    fun getRole(): String {
+        return this.role!!
+    }
+    fun setRole(role: String) {
+        this.role = role
+    }
+
     override fun toString(): String {
-        return "Username: ${this.getUsername()}\nEmail: ${this.getEmail()}\n"
+        return "[${this.getRole()}]\nUsername: ${this.getUsername()}\nEmail: ${this.getEmail()}\n"
     }
 
     fun toJSON(): String {
-        return "{\"username\": \"${this.getUsername()}\",\"email\": \"${this.getEmail()}\",\"password\": \"${this.getPass()}\",\"salt\": \"${this.getSalt()}\"}"
+        return "{\"username\": \"${this.getUsername()}\",\"email\": \"${this.getEmail()}\",\"password\": \"${this.getPass()}\",\"salt\": \"${this.getSalt()}\"\"role\": \"${this.getRole()}\"}"
     }
 }
