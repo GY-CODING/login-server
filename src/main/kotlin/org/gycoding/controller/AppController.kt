@@ -11,7 +11,7 @@ class AppController : Controller {
     var dbDAO: DBDAO? = null
 
     init {
-        dbDAO = DBFactory.getDAO(DBFactory.MODE_SQLITE)
+        dbDAO = DBFactory.getDAO(DBFactory.MODE_MYSQL)
     }
 
     override fun checkLogin(user: String, pass: String): Boolean {

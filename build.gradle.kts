@@ -21,11 +21,6 @@ repositories {
     mavenCentral()
 }
 
-tasks.jar {
-    from("/accounts.db")
-}
-
-
 ktor {
     fatJar {
         archiveFileName.set("GYServer.jar")
@@ -34,13 +29,6 @@ ktor {
         jreVersion.set(JavaVersion.VERSION_11)
         localImageName.set("GYServer")
         imageTag.set("v1.0.0")
-        /*externalRegistry.set(
-            io.ktor.plugin.features.DockerImageRegistry.dockerHub(
-                appName = provider { "ktor-app" },
-                username = providers.environmentVariable("DOCKER_HUB_USERNAME"),
-                password = providers.environmentVariable("DOCKER_HUB_PASSWORD")
-            )
-        )*/
     }
 }
 
@@ -52,4 +40,5 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     implementation("org.xerial:sqlite-jdbc:$sqlite_jdbc_version")
+    implementation("com.mysql:mysql-connector-j:8.0.33")
 }
