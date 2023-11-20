@@ -246,4 +246,20 @@ class MySQLDAO() : DBDAO {
             STATE_ERROR_DATABASE
         }
     }
+
+    override fun getSession(user: String, pass: String): User? {
+        return if(this.checkLogin(user, pass)) {
+            this.getUser(user)
+        } else {
+            null
+        }
+    }
+
+    override fun getSession(email: Email, pass: String): User? {
+        return if(this.checkLogin(email, pass)) {
+            this.getUser(email)
+        } else {
+            null
+        }
+    }
 }

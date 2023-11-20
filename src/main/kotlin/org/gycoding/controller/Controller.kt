@@ -30,4 +30,8 @@ interface Controller {
      * @see ByteArray
      */
     fun signUp(user: User, pass: String): Int
+
+    fun getSession(user: String, pass: String): User?
+
+    fun getSession(email: Email, pass: String): User?
 }
