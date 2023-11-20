@@ -37,5 +37,17 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
+        get("/session/{user}/{password}") {
+            try {
+                if(call.parameters["user"]!!.matches(Email.REGEX)) {
+                    call.respondText(appController.getSession(Email(call.parameters["user"]!!), call.parameters["password"]!!).toString())
+                } else {
+                    call.respondText(appController.getSession(call.parameters["user"]!!, call.parameters["password"]!!).toString())
+                }
+
+            } catch(e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message.toString())
+            }
+        }
     }
 }

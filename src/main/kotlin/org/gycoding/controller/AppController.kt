@@ -39,4 +39,20 @@ class AppController : Controller {
             throw e;
         }
     }
+
+    override fun getSession(user: String, pass: String): User? {
+        try {
+            return dbDAO!!.getSession(user, pass)
+        } catch(e: NotFoundException) {
+            throw e;
+        }
+    }
+
+    override fun getSession(email: Email, pass: String): User? {
+        try {
+            return dbDAO!!.getSession(email, pass)
+        } catch(e: NotFoundException) {
+            throw e;
+        }
+    }
 }

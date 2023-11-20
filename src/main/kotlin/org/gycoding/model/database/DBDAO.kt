@@ -49,4 +49,8 @@ interface DBDAO {
      * @throws SQLException
      */
     fun updateUserEmail(user: User, email: Email): Int
+
+    fun getSession(user: String, pass: String): User?
+
+    fun getSession(email: Email, pass: String): User?
 }

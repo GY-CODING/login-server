@@ -48,7 +48,7 @@ data class User (
     }
 
     override fun toString(): String {
-        return "[${this.getRole()}]\nUsername: ${this.getUsername()}\nEmail: ${this.getEmail()}\n"
+        return "${this.getUsername()};${this.getEmail()};${this.getRole()}"
     }
 
     fun toJSON(): String {
