@@ -2,6 +2,7 @@ package org.gycoding.model.database
 
 import io.ktor.server.plugins.*
 import org.gycoding.model.data.Email
+import org.gycoding.model.data.ServerState
 import org.gycoding.model.data.User
 import org.gycoding.model.utils.ByteHexConverter
 import org.gycoding.model.utils.Cipher
@@ -181,6 +182,58 @@ class MySQLDAO() : DBDAO {
         }
     }
 
+    @Throws(Exception::class)
+    private fun getUserTeam(username: String): MutableList<Int> {
+        val QUERY_USER_TEAM: String      = "SELECT teamElement1, teamElement2, teamElement3, teamElement4, teamElement5, teamElement6, teamElement7, teamElement8 FROM User WHERE username = \"${username}\""
+
+        try {
+            val rs: ResultSet            = this.executeQuery(QUERY_USER_TEAM)
+            var team: MutableList<Int>   = ArrayList<Int>()
+
+            while(rs.next()) {
+                team.add(rs.getInt("teamElement1"))
+                team.add(rs.getInt("teamElement2"))
+                team.add(rs.getInt("teamElement3"))
+                team.add(rs.getInt("teamElement4"))
+                team.add(rs.getInt("teamElement5"))
+                team.add(rs.getInt("teamElement6"))
+                team.add(rs.getInt("teamElement7"))
+                team.add(rs.getInt("teamElement8"))
+            }
+
+            return team
+        } catch(e: Exception) {
+            e.printStackTrace()
+            throw NotFoundException()
+        }
+    }
+
+    @Throws(Exception::class)
+    private fun getUserTeam(email: Email): MutableList<Int> {
+        val QUERY_USER_TEAM: String      = "SELECT teamElement1, teamElement2, teamElement3, teamElement4, teamElement5, teamElement6, teamElement7, teamElement8 FROM User WHERE email = \"${email}\""
+
+        try {
+            val rs: ResultSet            = this.executeQuery(QUERY_USER_TEAM)
+            var team: MutableList<Int>   = ArrayList<Int>()
+
+            while(rs.next()) {
+                team.add(rs.getInt("teamElement1"))
+                team.add(rs.getInt("teamElement2"))
+                team.add(rs.getInt("teamElement3"))
+                team.add(rs.getInt("teamElement4"))
+                team.add(rs.getInt("teamElement5"))
+                team.add(rs.getInt("teamElement6"))
+                team.add(rs.getInt("teamElement7"))
+                team.add(rs.getInt("teamElement8"))
+            }
+
+            return team
+        } catch(e: Exception) {
+            e.printStackTrace()
+            throw NotFoundException()
+        }
+    }
+
 
 
     /* ================# PUBLIC FUNCTIONS #================ */
@@ -196,60 +249,81 @@ class MySQLDAO() : DBDAO {
     }
 
     @Throws(SQLException::class)
-    override public fun signUp(user: User, pass: String): Int {
+    override public fun signUp(user: User, pass: String): ServerState {
         val salt: ByteArray = Cipher.generateSalt()
 
         return try {
             getUser(user.getUsername())
-            STATE_ERROR_USERNAME
+            ServerState.STATE_ERROR_USERNAME
         } catch(e: NotFoundException) {
             return try {
                 getUser(user.getEmail())
-                STATE_ERROR_EMAIL
+                ServerState.STATE_ERROR_EMAIL
             } catch(e: NotFoundException) {
                 val QUERY_INSERT_USER: String = "INSERT INTO User VALUES (\"${user.getUsername()}\", \"${user.getEmail()}\", ?, ?, \"${user.getRole()}\")"
 
                 return try {
                     executeByteInsert(QUERY_INSERT_USER, Cipher.hashPassword(pass, salt), salt)
-                    STATE_SUCCESS
+                    ServerState.STATE_SUCCESS
                 } catch(e: SQLException) {
-                    STATE_ERROR_DATABASE
+                    ServerState.STATE_ERROR_DATABASE
                 }
             }
         }
     }
 
     @Throws(SQLException::class)
-    override fun updateUserPassword(user: User, oldPass: String, newPass: String): Int {
-        val QUERY_UPDATE_PASSWORD: String = "UPDATE User SET password = \"${Cipher.hashPassword(newPass, user.getSalt())}\" WHERE username = \"${user.getUsername()}\""
+    override fun updateUserUsername(username: String, pass: String): ServerState {
+        val QUERY_UPDATE_USERNAME: String = "UPDATE User SET username = \"${username}\" WHERE username = \"${username}\""
 
-        return try {
-            if(Cipher.verifyPassword(oldPass, user.getSalt(), user.getPass())) {
-                executeUpdate(QUERY_UPDATE_PASSWORD)
-                STATE_SUCCESS;
-            } else {
-                STATE_ERROR_PASSWORD
+        return if(this.checkLogin(username, pass)) {
+            return try {
+                executeUpdate(QUERY_UPDATE_USERNAME)
+                ServerState.STATE_SUCCESS
+            } catch (e: SQLException) {
+                ServerState.STATE_ERROR_DATABASE
             }
-        } catch(e: SQLException) {
-            STATE_ERROR_DATABASE
+        } else {
+            ServerState.STATE_ERROR_PASSWORD
         }
     }
 
     @Throws(SQLException::class)
-    override fun updateUserEmail(user: User, email: Email): Int {
-        val QUERY_UPDATE_EMAIL: String = "UPDATE User SET email = \"${email}\" WHERE username = \"${user.getUsername()}\""
+    override fun updateUserPassword(username: String, oldPass: String, newPass: String): ServerState {
+        val tempUser: User = this.getUser(username)!!
+        val QUERY_UPDATE_PASSWORD: String = "UPDATE User SET password = \"${Cipher.hashPassword(newPass, tempUser.getSalt())}\" WHERE username = \"${username}\""
 
-        return try {
-            executeUpdate(QUERY_UPDATE_EMAIL)
-            STATE_SUCCESS
-        } catch(e: SQLException) {
-            STATE_ERROR_DATABASE
+        return if(this.checkLogin(username, oldPass)) {
+            return try {
+                executeUpdate(QUERY_UPDATE_PASSWORD)
+                ServerState.STATE_SUCCESS
+            } catch (e: SQLException) {
+                ServerState.STATE_ERROR_DATABASE
+            }
+        } else {
+            ServerState.STATE_ERROR_PASSWORD
         }
     }
 
-    override fun getSession(user: String, pass: String): User? {
-        return if(this.checkLogin(user, pass)) {
-            this.getUser(user)
+    @Throws(SQLException::class)
+    override fun updateUserEmail(user: User, pass: String): ServerState {
+        val QUERY_UPDATE_EMAIL: String = "UPDATE User SET email = \"${user.getEmail()}\" WHERE username = \"${user.getUsername()}\""
+
+        return if(this.checkLogin(user.getUsername(), pass)) {
+            return try {
+                executeUpdate(QUERY_UPDATE_EMAIL)
+                ServerState.STATE_SUCCESS
+            } catch (e: SQLException) {
+                ServerState.STATE_ERROR_DATABASE
+            }
+        } else {
+            ServerState.STATE_ERROR_PASSWORD
+        }
+    }
+
+    override fun getSession(username: String, pass: String): User? {
+        return if(this.checkLogin(username, pass)) {
+            this.getUser(username)
         } else {
             null
         }
@@ -258,6 +332,22 @@ class MySQLDAO() : DBDAO {
     override fun getSession(email: Email, pass: String): User? {
         return if(this.checkLogin(email, pass)) {
             this.getUser(email)
+        } else {
+            null
+        }
+    }
+
+    override fun getTeam(username: String, pass: String): String? {
+        return if(this.checkLogin(username, pass)) {
+            this.getUserTeam(username).joinToString(";")
+        } else {
+            null
+        }
+    }
+
+    override fun getTeam(email: Email, pass: String): String? {
+        return if(this.checkLogin(email, pass)) {
+            this.getUserTeam(email).joinToString(";")
         } else {
             null
         }

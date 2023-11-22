@@ -1,6 +1,7 @@
 package org.gycoding.controller
 
 import org.gycoding.model.data.Email
+import org.gycoding.model.data.ServerState
 import org.gycoding.model.data.User
 import java.sql.SQLException
 
@@ -29,9 +30,41 @@ interface Controller {
      * @throws SQLException
      * @see ByteArray
      */
-    fun signUp(user: User, pass: String): Int
+    fun signUp(user: User, pass: String): ServerState
 
-    fun getSession(user: String, pass: String): User?
+    /**
+     * Updates the username of an user from the database.
+     * @param username
+     * @param pass User's password.
+     * @return Integer representing the status of the data update.
+     * @throws SQLException
+     */
+    fun updateUserUsername(username: String, pass: String): ServerState
+
+    /**
+     * Updates the password of an user from the database.
+     * @param user User object (containing all of the necessary data for the registration process).
+     * @param oldPass Old password.
+     * @param newPass New password.
+     * @return Integer representing the status of the data update.
+     * @throws SQLException
+     */
+    fun updateUserPassword(username: String, oldPass: String, newPass: String): ServerState
+
+    /**
+     * Updates the password of an user from the database.
+     * @param user User object (containing all of the necessary data for the registration process).
+     * @param pass Current user password.
+     * @return Integer representing the status of the data update.
+     * @throws SQLException
+     */
+    fun updateUserEmail(user: User, pass: String): ServerState
+
+    fun getTeam(username: String, pass: String): String?
+
+    fun getTeam(email: Email, pass: String): String?
+
+    fun getSession(username: String, pass: String): User?
 
     fun getSession(email: Email, pass: String): User?
 }
