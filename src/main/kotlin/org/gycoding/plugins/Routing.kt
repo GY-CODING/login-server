@@ -30,9 +30,41 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
-        get("/signup/{user}/{email}/{password}") {
+        get("/signup/{username}/{email}/{password}") {
             try {
-                call.respondText(appController.signUp(User(call.parameters["user"]!!, Email(call.parameters["email"]!!)), call.parameters["password"]!!).toString())
+                call.respondText(appController.signUp(User(call.parameters["username"]!!, Email(call.parameters["email"]!!)), call.parameters["password"]!!).toString())
+            } catch(e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message.toString())
+            }
+        }
+        get("/update/user/{username}/{password}") {
+            try {
+                call.respondText(appController.updateUserUsername(call.parameters["username"]!!, call.parameters["password"]!!).toString())
+            } catch(e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message.toString())
+            }
+        }
+        get("/update/email/{username}/{email}/{password}") {
+            try {
+                call.respondText(appController.updateUserEmail(User(call.parameters["username"]!!, Email(call.parameters["email"]!!)), call.parameters["password"]!!).toString())
+            } catch(e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message.toString())
+            }
+        }
+        get("/update/password/{username}/{oldPassword}/{newPassword}") {
+            try {
+                call.respondText(appController.updateUserPassword(call.parameters["username"]!!, call.parameters["oldPassword"]!!, call.parameters["newPassword"]!!).toString())
+            } catch(e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message.toString())
+            }
+        }
+        get("/team/{user}/{password}") {
+            try {
+                if(call.parameters["user"]!!.matches(Email.REGEX)) {
+                    call.respondText(appController.getTeam(Email(call.parameters["user"]!!), call.parameters["password"]!!).toString())
+                } else {
+                    call.respondText(appController.getTeam(call.parameters["user"]!!, call.parameters["password"]!!).toString())
+                }
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
