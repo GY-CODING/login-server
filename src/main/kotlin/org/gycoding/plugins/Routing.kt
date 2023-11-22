@@ -32,28 +32,28 @@ fun Application.configureRouting() {
         }
         get("/signup/{username}/{email}/{password}") {
             try {
-                call.respondText(appController.signUp(User(call.parameters["username"]!!, Email(call.parameters["email"]!!)), call.parameters["password"]!!).toString())
+                call.respondText(appController.signUp(User(call.parameters["username"]!!, Email(call.parameters["email"]!!)), call.parameters["password"]!!).value.toString())
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
         get("/update/user/{username}/{password}") {
             try {
-                call.respondText(appController.updateUserUsername(call.parameters["username"]!!, call.parameters["password"]!!).toString())
+                call.respondText(appController.updateUserUsername(call.parameters["username"]!!, call.parameters["password"]!!).value.toString())
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
         get("/update/email/{username}/{email}/{password}") {
             try {
-                call.respondText(appController.updateUserEmail(User(call.parameters["username"]!!, Email(call.parameters["email"]!!)), call.parameters["password"]!!).toString())
+                call.respondText(appController.updateUserEmail(User(call.parameters["username"]!!, Email(call.parameters["email"]!!)), call.parameters["password"]!!).value.toString())
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
         get("/update/password/{username}/{oldPassword}/{newPassword}") {
             try {
-                call.respondText(appController.updateUserPassword(call.parameters["username"]!!, call.parameters["oldPassword"]!!, call.parameters["newPassword"]!!).toString())
+                call.respondText(appController.updateUserPassword(call.parameters["username"]!!, call.parameters["oldPassword"]!!, call.parameters["newPassword"]!!).value.toString())
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
@@ -64,6 +64,19 @@ fun Application.configureRouting() {
                     call.respondText(appController.getTeam(Email(call.parameters["user"]!!), call.parameters["password"]!!).toString())
                 } else {
                     call.respondText(appController.getTeam(call.parameters["user"]!!, call.parameters["password"]!!).toString())
+                }
+            } catch(e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message.toString())
+            }
+        }
+        get("/team/{user}/{password}/{team}") {
+            val DELIM: String = ";"
+
+            try {
+                if(call.parameters["user"]!!.matches(Email.REGEX)) {
+                    call.respondText(appController.setTeam(Email(call.parameters["user"]!!), call.parameters["password"]!!, call.parameters["team"]!!.split(DELIM).map { it.toInt() }).value.toString())
+                } else {
+                    call.respondText(appController.setTeam(call.parameters["user"]!!, call.parameters["password"]!!, call.parameters["team"]!!.split(DELIM).map { it.toInt() }).value.toString())
                 }
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())

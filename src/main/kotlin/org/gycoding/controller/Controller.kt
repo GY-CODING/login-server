@@ -64,6 +64,10 @@ interface Controller {
 
     fun getTeam(email: Email, pass: String): String?
 
+    fun setTeam(username: String, pass: String, team: List<Int>): ServerState
+
+    fun setTeam(email: Email, pass: String, team: List<Int>): ServerState
+
     fun getSession(username: String, pass: String): User?
 
     fun getSession(email: Email, pass: String): User?

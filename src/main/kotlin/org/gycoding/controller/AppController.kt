@@ -87,6 +87,22 @@ class AppController : Controller {
         }
     }
 
+    override fun setTeam(username: String, pass: String, team: List<Int>): ServerState {
+        try {
+            return dbDAO!!.setTeam(username, pass, team)
+        } catch(e: NotFoundException) {
+            throw e;
+        }
+    }
+
+    override fun setTeam(email: Email, pass: String, team: List<Int>): ServerState {
+        try {
+            return dbDAO!!.setTeam(email, pass, team)
+        } catch(e: NotFoundException) {
+            throw e;
+        }
+    }
+
     override fun getSession(username: String, pass: String): User? {
         try {
             return dbDAO!!.getSession(username, pass)
