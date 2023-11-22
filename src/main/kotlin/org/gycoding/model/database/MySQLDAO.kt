@@ -352,4 +352,34 @@ class MySQLDAO() : DBDAO {
             null
         }
     }
+
+    override fun setTeam(username: String, pass: String, team: List<Int>): ServerState {
+        val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE username = \"${username}\""
+
+        return if(this.checkLogin(username, pass)) {
+            return try {
+                executeUpdate(QUERY_UPDATE_TEAMS)
+                ServerState.STATE_SUCCESS
+            } catch (e: SQLException) {
+                ServerState.STATE_ERROR_DATABASE
+            }
+        } else {
+            ServerState.STATE_ERROR_PASSWORD
+        }
+    }
+
+    override fun setTeam(email: Email, pass: String, team: List<Int>): ServerState {
+        val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE email = \"${email.toString()}\""
+
+        return if(this.checkLogin(email, pass)) {
+            return try {
+                executeUpdate(QUERY_UPDATE_TEAMS)
+                ServerState.STATE_SUCCESS
+            } catch (e: SQLException) {
+                ServerState.STATE_ERROR_DATABASE
+            }
+        } else {
+            ServerState.STATE_ERROR_PASSWORD
+        }
+    }
 }
