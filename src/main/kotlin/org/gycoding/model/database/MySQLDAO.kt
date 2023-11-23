@@ -239,28 +239,34 @@ class MySQLDAO() : DBDAO {
     /* ================# PUBLIC FUNCTIONS #================ */
 
     override public fun checkLogin(user: String, pass: String): Boolean {
-        val user: User = this.getUser(user)!!
-        return Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
+        return try {
+            val user: User = this.getUser(user)!!
+            Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
+        } catch(e: Exception) {
+            false
+        }
     }
 
     override public fun checkLogin(email: Email, pass: String): Boolean {
-        val user: User = this.getUser(email)!!
-        return Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
+        return try {
+            val user: User = this.getUser(email)!!
+            Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
+        } catch(e: Exception) {
+            false
+        }
     }
 
     @Throws(SQLException::class)
     override public fun signUp(user: User, pass: String): ServerState {
         val salt: ByteArray = Cipher.generateSalt()
 
-        return try {
-            getUser(user.getUsername())
+        return if(getUser(user.getUsername()) != null) {
             ServerState.STATE_ERROR_USERNAME
-        } catch(e: NotFoundException) {
-            return try {
-                getUser(user.getEmail())
+        } else {
+            return if(getUser(user.getEmail()) != null) {
                 ServerState.STATE_ERROR_EMAIL
-            } catch(e: NotFoundException) {
-                val QUERY_INSERT_USER: String = "INSERT INTO User VALUES (\"${user.getUsername()}\", \"${user.getEmail()}\", ?, ?, \"${user.getRole()}\")"
+            } else {
+                val QUERY_INSERT_USER: String = "INSERT INTO User (username, email, password, salt, role) VALUES (\"${user.getUsername()}\", \"${user.getEmail()}\", ?, ?, \"${user.getRole()}\")"
 
                 return try {
                     executeByteInsert(QUERY_INSERT_USER, Cipher.hashPassword(pass, salt), salt)
@@ -273,8 +279,8 @@ class MySQLDAO() : DBDAO {
     }
 
     @Throws(SQLException::class)
-    override fun updateUserUsername(username: String, pass: String): ServerState {
-        val QUERY_UPDATE_USERNAME: String = "UPDATE User SET username = \"${username}\" WHERE username = \"${username}\""
+    override fun updateUserUsername(username: String, newUsername: String, pass: String): ServerState {
+        val QUERY_UPDATE_USERNAME: String = "UPDATE User SET username = \"${newUsername}\" WHERE username = \"${username}\""
 
         return if(this.checkLogin(username, pass)) {
             return try {
@@ -291,7 +297,7 @@ class MySQLDAO() : DBDAO {
     @Throws(SQLException::class)
     override fun updateUserPassword(username: String, oldPass: String, newPass: String): ServerState {
         val tempUser: User = this.getUser(username)!!
-        val QUERY_UPDATE_PASSWORD: String = "UPDATE User SET password = \"${Cipher.hashPassword(newPass, tempUser.getSalt())}\" WHERE username = \"${username}\""
+        val QUERY_UPDATE_PASSWORD: String = "UPDATE User SET password = \"${ByteHexConverter.bytesToHex(Cipher.hashPassword(newPass, tempUser.getSalt()))}\" WHERE username = \"${username}\""
 
         return if(this.checkLogin(username, oldPass)) {
             return try {
