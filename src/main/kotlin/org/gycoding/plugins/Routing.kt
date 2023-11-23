@@ -25,7 +25,6 @@ fun Application.configureRouting() {
                 } else {
                     call.respondText(appController.checkLogin(call.parameters["user"]!!, call.parameters["password"]!!).toString())
                 }
-
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
@@ -37,9 +36,9 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
-        get("/update/user/{username}/{password}") {
+        get("/update/user/{username}/{newUsername}/{password}") {
             try {
-                call.respondText(appController.updateUserUsername(call.parameters["username"]!!, call.parameters["password"]!!).value.toString())
+                call.respondText(appController.updateUserUsername(call.parameters["username"]!!, call.parameters["newUsername"]!!, call.parameters["password"]!!).value.toString())
             } catch(e: NotFoundException) {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }

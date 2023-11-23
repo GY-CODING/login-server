@@ -39,7 +39,7 @@ interface DBDAO {
      * @return Integer representing the status of the data update.
      * @throws SQLException
      */
-    fun updateUserUsername(username: String, pass: String): ServerState
+    fun updateUserUsername(username: String, newUsername: String, pass: String): ServerState
 
     /**
      * Updates the password of an user from the database.

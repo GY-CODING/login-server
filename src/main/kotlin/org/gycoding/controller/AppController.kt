@@ -41,9 +41,9 @@ class AppController : Controller {
         }
     }
 
-    override fun updateUserUsername(username: String, pass: String): ServerState {
+    override fun updateUserUsername(username: String, newUsername: String, pass: String): ServerState {
         try {
-            return dbDAO!!.updateUserUsername(username, pass)
+            return dbDAO!!.updateUserUsername(username, newUsername, pass)
         } catch(e: NotFoundException) {
             throw e;
         } catch(e: SQLException) {
