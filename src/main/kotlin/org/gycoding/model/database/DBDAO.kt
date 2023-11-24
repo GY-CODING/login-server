@@ -60,13 +60,13 @@ interface DBDAO {
      */
     fun updateUserEmail(user: User, pass: String): ServerState
 
-    fun getTeam(username: String, pass: String): String?
+    fun getTeam(username: String): String?
 
-    fun getTeam(email: Email, pass: String): String?
+    fun getTeam(email: Email): String?
 
-    fun setTeam(username: String, pass: String, team: List<Int>): ServerState
+    fun setTeam(username: String, team: List<Int>): ServerState
 
-    fun setTeam(email: Email, pass: String, team: List<Int>): ServerState
+    fun setTeam(email: Email, team: List<Int>): ServerState
 
     fun getSession(username: String, pass: String): User?
 

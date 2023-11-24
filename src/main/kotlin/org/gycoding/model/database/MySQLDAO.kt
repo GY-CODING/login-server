@@ -343,49 +343,43 @@ class MySQLDAO() : DBDAO {
         }
     }
 
-    override fun getTeam(username: String, pass: String): String? {
-        return if(this.checkLogin(username, pass)) {
+    override fun getTeam(username: String): String? {
+        return try {
             this.getUserTeam(username).joinToString(";")
-        } else {
+        } catch(e: Exception) {
+            e.printStackTrace()
             null
         }
     }
 
-    override fun getTeam(email: Email, pass: String): String? {
-        return if(this.checkLogin(email, pass)) {
+    override fun getTeam(email: Email): String? {
+        return try {
             this.getUserTeam(email).joinToString(";")
-        } else {
+        } catch(e: Exception){
+            e.printStackTrace()
             null
         }
     }
 
-    override fun setTeam(username: String, pass: String, team: List<Int>): ServerState {
+    override fun setTeam(username: String, team: List<Int>): ServerState {
         val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE username = \"${username}\""
 
-        return if(this.checkLogin(username, pass)) {
-            return try {
-                executeUpdate(QUERY_UPDATE_TEAMS)
-                ServerState.STATE_SUCCESS
-            } catch (e: SQLException) {
-                ServerState.STATE_ERROR_DATABASE
-            }
-        } else {
-            ServerState.STATE_ERROR_PASSWORD
+        return try {
+            executeUpdate(QUERY_UPDATE_TEAMS)
+            ServerState.STATE_SUCCESS
+        } catch (e: SQLException) {
+            ServerState.STATE_ERROR_DATABASE
         }
     }
 
-    override fun setTeam(email: Email, pass: String, team: List<Int>): ServerState {
+    override fun setTeam(email: Email, team: List<Int>): ServerState {
         val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE email = \"${email.toString()}\""
 
-        return if(this.checkLogin(email, pass)) {
-            return try {
-                executeUpdate(QUERY_UPDATE_TEAMS)
-                ServerState.STATE_SUCCESS
-            } catch (e: SQLException) {
-                ServerState.STATE_ERROR_DATABASE
-            }
-        } else {
-            ServerState.STATE_ERROR_PASSWORD
+        return try {
+            executeUpdate(QUERY_UPDATE_TEAMS)
+            ServerState.STATE_SUCCESS
+        } catch (e: SQLException) {
+            ServerState.STATE_ERROR_DATABASE
         }
     }
 }
