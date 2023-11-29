@@ -14,6 +14,11 @@ import java.sql.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * Objeto de acceso a datos de la base de datos en AWS RDS con MySQL.
+ * @author Iván Vicente Morales
+ * @see <a href="https://aws.amazon.com/es/rds/">Amazon Web Services RDS</a>
+ */
 class MySQLDAO() : DBDAO {
     private var conn: Connection? = null
 
