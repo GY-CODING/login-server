@@ -71,33 +71,33 @@ class AppController : Controller {
         }
     }
 
-    override fun getTeam(username: String, pass: String): String? {
+    override fun getTeam(username: String): String? {
         try {
-            return dbDAO!!.getTeam(username, pass)
+            return dbDAO!!.getTeam(username)
         } catch(e: NotFoundException) {
             throw e;
         }
     }
 
-    override fun getTeam(email: Email, pass: String): String? {
+    override fun getTeam(email: Email): String? {
         try {
-            return dbDAO!!.getTeam(email, pass)
+            return dbDAO!!.getTeam(email)
         } catch(e: NotFoundException) {
             throw e;
         }
     }
 
-    override fun setTeam(username: String, pass: String, team: List<Int>): ServerState {
+    override fun setTeam(username: String, team: List<Int>): ServerState {
         try {
-            return dbDAO!!.setTeam(username, pass, team)
+            return dbDAO!!.setTeam(username, team)
         } catch(e: NotFoundException) {
             throw e;
         }
     }
 
-    override fun setTeam(email: Email, pass: String, team: List<Int>): ServerState {
+    override fun setTeam(email: Email, team: List<Int>): ServerState {
         try {
-            return dbDAO!!.setTeam(email, pass, team)
+            return dbDAO!!.setTeam(email, team)
         } catch(e: NotFoundException) {
             throw e;
         }

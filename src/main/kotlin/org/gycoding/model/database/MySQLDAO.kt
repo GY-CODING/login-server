@@ -246,7 +246,11 @@ class MySQLDAO() : DBDAO {
         conn = connect()
 
         return try {
+            this.conn = connect()
             val user: User = this.getUser(user)!!
+            this.conn!!.close()
+            this.conn = null
+
             Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
         } catch(e: Exception) {
             false
@@ -259,7 +263,11 @@ class MySQLDAO() : DBDAO {
         conn = connect()
 
         return try {
+            this.conn = connect()
             val user: User = this.getUser(email)!!
+            this.conn!!.close()
+            this.conn = null
+
             Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
         } catch(e: Exception) {
             false
