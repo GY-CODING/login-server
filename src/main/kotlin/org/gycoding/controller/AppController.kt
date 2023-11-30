@@ -8,6 +8,10 @@ import org.gycoding.model.database.DBDAO
 import org.gycoding.model.database.DBFactory
 import java.sql.SQLException
 
+/**
+ * Controlador de la aplicación.
+ * @author Iván Vicente Morales
+ */
 class AppController : Controller {
     var dbDAO: DBDAO? = null
 

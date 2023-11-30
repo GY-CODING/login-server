@@ -3,11 +3,16 @@ package org.gycoding.model.utils
 import java.security.SecureRandom
 import java.security.MessageDigest
 
-public object Cipher {
+/**
+ * Singleton de cifrado de cadenas de caracteres.
+ * @author Iván Vicente Morales
+ */
+object Cipher {
     /**
-     * Generates a random salt.
-     * @return The salt as an array of bytes.
+     * Genera una sal aleatoria.
+     * @return Sal en formato array de bytes.
      * @see ByteArray
+     * @author Iván Vicente Morales
      */
     fun generateSalt(): ByteArray {
         val salt = ByteArray(16)
@@ -17,11 +22,12 @@ public object Cipher {
     }
 
     /**
-     * Hashes a given password.
-     * @param password Input password in plain text.
-     * @param salt Random salt generated specifically for this hash generation.
-     * @return The hashed password as an array of bytes.
+     * Cifra una contraseña con una función hash SHA-256 y la sal generada y asociada al usuario.
+     * @param password Contraseña del usuario.
+     * @param salt Sal del usuario.
+     * @return Contraseña ya cifrada en formato array de bytes.
      * @see ByteArray
+     * @author Iván Vicente Morales
      */
     fun hashPassword(password: String, salt: ByteArray): ByteArray {
         val md = MessageDigest.getInstance("SHA-256")
@@ -31,12 +37,13 @@ public object Cipher {
     }
 
     /**
-     * Evaluates a given password with a hashed function, conditioned by a salt.
-     * @param enteredPassword Input password in plain text.
-     * @param salt
-     * @param storedHashedPassword A hashed password as an array of bytes.
-     * @return The evaluation of passwords.
+     * Evalúa la equidad de una contraseña de entrada, frente a la contraseña de un usuario, junto a su sal asociada.
+     * @param enteredPassword Contraseña de entrada
+     * @param salt Sal del usuario en formato array de bytes.
+     * @param storedHashedPassword Contraseña del usuario en formato array de bytes.
+     * @return Evaluación de la equidad.
      * @see ByteArray
+     * @author Iván Vicente Morales
      */
     fun verifyPassword(enteredPassword: String, salt: ByteArray, storedHashedPassword: ByteArray): Boolean {
         val calculatedHash = hashPassword(enteredPassword, salt)

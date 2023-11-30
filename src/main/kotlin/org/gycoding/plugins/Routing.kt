@@ -14,9 +14,6 @@ import org.gycoding.model.data.User
 fun Application.configureRouting() {
     val appController: Controller   = AppController()
 
-    var userTemp: String            = ""
-    var passTemp: String            = ""
-
     routing {
         get("/login/{user}/{password}") {
             try {

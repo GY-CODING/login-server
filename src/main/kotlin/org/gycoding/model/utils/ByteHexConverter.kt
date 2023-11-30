@@ -1,10 +1,14 @@
 package org.gycoding.model.utils
 
+/**
+ * Conversor bidireccional de bytes y cadenas hexadecimales.
+ * @author Iván Vicente Morales
+ */
 object ByteHexConverter {
     /**
-     * Converts an array of bytes to a stringified hexadecimal number.
-     * @param bytes Array of bytes to be converted.
-     * @return Stringified hexadecimal number.
+     * Convierte un array de bytes a una cadena hexadecimal.
+     * @param bytes Array de bytes.
+     * @return Cadena hexadecimal.
      * @author Iván Vicente Morales
      */
     public fun bytesToHex(bytes: ByteArray): String {
@@ -16,9 +20,9 @@ object ByteHexConverter {
     }
 
     /**
-     * Converts a stringified hexadecimal number to an array of bytes.
-     * @param hex Array of bytes to be converted.
-     * @return Array of bytes.
+     * Convierte una cadena hexadecimal en un array de bytes.
+     * @param hex Cadena hexadecimal.
+     * @return Array de bytes.
      * @author Iván Vicente Morales.
      */
     public fun hexToBytes(hex: String): ByteArray {

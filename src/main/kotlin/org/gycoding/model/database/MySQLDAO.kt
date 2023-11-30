@@ -7,14 +7,9 @@ import org.gycoding.model.data.ServerState
 import org.gycoding.model.data.User
 import org.gycoding.model.utils.ByteHexConverter
 import org.gycoding.model.utils.Cipher
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
 import java.sql.*
 import java.sql.Connection
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Objeto de acceso a datos de la base de datos en AWS RDS con MySQL.
@@ -41,16 +36,17 @@ class MySQLDAO() : DBDAO {
     /* ================# PRIVATE FUNCTIONS #================ */
 
     /**
-     * Connects to a database.
-     * @return Connection instance.
+     * Conecta a una base de datos.
+     * @return Instancia de la conexión.
      * @see Connection
+     * @author Iván Vicente Morales
      */
     fun connect(): Connection? {
-        val URL: String             = "ivm-accounts.ch53lvtsczj2.eu-west-3.rds.amazonaws.com"
-        val PORT: Int               = 3306
-        val DATABASE_NAME: String   = "ivmaccounts"
-        val USER: String            = "admin"
-        val PASSWORD: String        = "ivmmanager"
+        val URL: String             = System.getenv("MYSQL_URL")
+        val PORT: Int               = System.getenv("MYSQL_PORT").toInt()
+        val DATABASE_NAME: String   = System.getenv("MYSQL_DB")
+        val USER: String            = System.getenv("MYSQL_USER")
+        val PASSWORD: String        = System.getenv("MYSQL_PASS")
 
         val PATH                = "jdbc:mysql://${URL}:${PORT}/${DATABASE_NAME}"
         val CONNECTION_SUCCESS  = "Connection set successfuly."
@@ -60,15 +56,16 @@ class MySQLDAO() : DBDAO {
             println(CONNECTION_SUCCESS)
             conn
         } catch (e: SQLException) {
-            println(e.message)
+            e.printStackTrace()
             null
         }
     }
 
     /**
-     * Executes a DML sentence of insert to the SQL database.
-     * @param sql SQL sentence (scripts are not allowed).
+     * Ejecuta una inserción en la base de datos.
+     * @param sql Sentencia SQL (no admite scripts).
      * @throws SQLException
+     * @author Iván Vicente Morales
      */
     @Throws(SQLException::class)
     private fun executeInsert(sql: String) {
@@ -81,13 +78,13 @@ class MySQLDAO() : DBDAO {
     }
 
     /**
-     * Executes a DML sentence of insert to the SQL database,
-     * where the data is specifically thought to be a hashed password and its salt.
-     * @param sql SQL sentence (scripts are not allowed).
-     * @param pass Hashed password.
-     * @param salt User associated salt.
+     * Ejecuta una inserción binaria en la base de datos.
+     * @param sql Sentencia SQL (no admite scripts).
+     * @param pass Contraseña cifrada.
+     * @param salt Sal cifrada asociada al usuario.
      * @throws SQLException
      * @see ByteArray
+     * @author Iván Vicente Morales
      */
     @Throws(SQLException::class)
     private fun executeByteInsert(sql: String, pass: ByteArray, salt: ByteArray) {
@@ -104,9 +101,10 @@ class MySQLDAO() : DBDAO {
     }
 
     /**
-     * Executes a DML sentence of update to the SQL database.
-     * @param sql SQL sentence (scripts are not allowed).
+     * Ejecuta una modificación a un registro de la base de datos.
+     * @param sql Sentencia SQL (no admite scripts).
      * @throws SQLException
+     * @author Iván Vicente Morales
      */
     @Throws(SQLException::class)
     private fun executeUpdate(sql: String) {
@@ -116,11 +114,12 @@ class MySQLDAO() : DBDAO {
     }
 
     /**
-     * Executes a query selection from the SQL database.
-     * @param sql SQL sentence (scripts are not allowed).
-     * @return Set of results given by the query selection.
+     * Ejecuta una selección a la base de datos.
+     * @param sql Sentencia SQL (no admite scripts).
+     * @return Conjunto de resultados que devuelve la consulta.
      * @throws SQLException
      * @see ResultSet
+     * @author Iván Vicente Morales
      */
     @Throws(SQLException::class)
     private fun executeQuery(sql: String): ResultSet {
@@ -129,13 +128,14 @@ class MySQLDAO() : DBDAO {
     }
 
     /**
-     * Returns a user instance conditioned by the username given as parameter.
-     * @param username Username over which the query sleection will be executed, returning the user instance of it.
-     * @return User instance
+     * Devuelve un usuario.
+     * @param username Nombre del usuario
+     * @return Usuario
      * @throws NotFoundException
      * @see User
+     * @author Iván Vicente Morales
      */
-    @Throws(Exception::class)
+    @Throws(NotFoundException::class)
     private fun getUser(username: String): User? {
         val QUERY_USER: String      = "SELECT username, email, password, salt, role FROM User WHERE username = \"${username}\""
 
@@ -159,13 +159,14 @@ class MySQLDAO() : DBDAO {
     }
 
     /**
-     * Returns a user instance condition by the email given as parameter.
-     * @param email Email over which the query sleection will be executed, returning the user instance of it (any service is allowed).
-     * @return User instance
+     * Devuelve un usuario.
+     * @param email Email del usuario.
+     * @return Usuario
      * @throws NotFoundException
      * @see User
+     * @author Iván Vicente Morales
      */
-    @Throws(Exception::class)
+    @Throws(NotFoundException::class)
     private fun getUser(email: Email): User? {
         val QUERY_USER: String      = "SELECT username, email, password, salt, role FROM User WHERE email = \"${email}\""
 
@@ -188,7 +189,16 @@ class MySQLDAO() : DBDAO {
         }
     }
 
-    @Throws(Exception::class)
+    /**
+     * Devuelve el equipo de un usuario como una lista mutable de identificadores de cada personaje.
+     * @param username Nombre del usuario.
+     * @return Lista mutable de identificadores de cada personaje del equipo del usuario.
+     * @throws NotFoundException
+     * @see User
+     * @see MutableList
+     * @author Iván Vicente Morales
+     */
+    @Throws(NotFoundException::class)
     private fun getUserTeam(username: String): MutableList<Int> {
         val QUERY_USER_TEAM: String      = "SELECT teamElement1, teamElement2, teamElement3, teamElement4, teamElement5, teamElement6, teamElement7, teamElement8 FROM User WHERE username = \"${username}\""
 
@@ -214,7 +224,16 @@ class MySQLDAO() : DBDAO {
         }
     }
 
-    @Throws(Exception::class)
+    /**
+     * Devuelve el equipo de un usuario como una lista mutable de identificadores de cada personaje.
+     * @param email Email del usuario.
+     * @return Lista mutable de identificadores de cada personaje del equipo del usuario.
+     * @throws NotFoundException
+     * @see User
+     * @see MutableList
+     * @author Iván Vicente Morales
+     */
+    @Throws(NotFoundException::class)
     private fun getUserTeam(email: Email): MutableList<Int> {
         val QUERY_USER_TEAM: String      = "SELECT teamElement1, teamElement2, teamElement3, teamElement4, teamElement5, teamElement6, teamElement7, teamElement8 FROM User WHERE email = \"${email}\""
 

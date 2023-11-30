@@ -1,4 +1,5 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+import org.jetbrains.dokka.gradle.DokkaTask
 
 val ktor_version: String by project
 val kotlin_version: String by project
@@ -8,6 +9,7 @@ val sqlite_jdbc_version: String by project
 plugins {
     kotlin("jvm") version "1.9.10"
     id("io.ktor.plugin") version "2.3.5"
+    id("org.jetbrains.dokka") version "1.9.10"
 }
 
 group = "org.gycoding"
@@ -19,6 +21,8 @@ application {
 
 repositories {
     mavenCentral()
+    maven("https://dl.bintray.com/kotlin/ktor")
+    maven("https://dl.bintray.com/kotlin/dokka")
 }
 
 ktor {
@@ -29,6 +33,12 @@ ktor {
         jreVersion.set(JavaVersion.VERSION_11)
         localImageName.set("GYServer")
         imageTag.set("v1.0.0")
+    }
+}
+
+tasks {
+    val dokkaHtml by getting(DokkaTask::class) {
+        outputDirectory.set(buildDir.resolve("docs/html"))
     }
 }
 
