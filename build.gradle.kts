@@ -38,7 +38,7 @@ ktor {
 
 tasks {
     val dokkaHtml by getting(DokkaTask::class) {
-        outputDirectory.set(buildDir.resolve("docs"))
+        outputDirectory.set(buildDir.resolve("../docs"))
     }
 }
 
