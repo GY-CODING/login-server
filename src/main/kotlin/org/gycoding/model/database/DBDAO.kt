@@ -64,36 +64,32 @@ interface DBDAO {
     /**
      * Devuelve los IDs del equipo completo del usuario.
      * @param username Nombre del usuario.
-     * @param pass
      * @return IDs del equipo completo del usuario compactados en una cadena de caracteres.
      */
-    fun getTeam(username: String, pass: String): String?
+    fun getTeam(username: String): String?
 
     /**
      * Devuelve los IDs del equipo completo del usuario.
      * @param email Email del usuario (cualquier servicio está permitido).
-     * @param pass
      * @return IDs del equipo completo del usuario compactados en una cadena de caracteres.
      */
-    fun getTeam(email: Email, pass: String): String?
+    fun getTeam(email: Email): String?
 
     /**
      * Establece el equipo de un usuario (los IDs).
      * @param username Nombre del usuario.
-     * @param pass
      * @param team Lista de identificadores de los personajes que conforman el equipo del usuario.
      * @return Estado de la modificación del equipo del usuario.
      */
-    fun setTeam(username: String, pass: String, team: List<Int>): ServerState
+    fun setTeam(username: String, team: List<Int>): ServerState
 
     /**
      * Establece el equipo de un usuario (los IDs).
      * @param email Email del usuario (cualquier servicio está permitido).
-     * @param pass
      * @param team Lista de identificadores de los personajes que conforman el equipo del usuario.
      * @return Estado de la modificación del equipo del usuario.
      */
-    fun setTeam(email: Email, pass: String, team: List<Int>): ServerState
+    fun setTeam(email: Email, team: List<Int>): ServerState
 
     /**
      * Devuelve la sesión de la cuenta que haga login.

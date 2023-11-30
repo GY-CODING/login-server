@@ -1,5 +1,6 @@
 package org.gycoding.model.database
 
+import io.ktor.network.sockets.*
 import io.ktor.server.plugins.*
 import org.gycoding.model.data.Email
 import org.gycoding.model.data.ServerState
@@ -11,6 +12,7 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.sql.*
+import java.sql.Connection
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -248,8 +250,6 @@ class MySQLDAO() : DBDAO {
         return try {
             this.conn = connect()
             val user: User = this.getUser(user)!!
-            this.conn!!.close()
-            this.conn = null
 
             Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
         } catch(e: Exception) {
@@ -265,8 +265,6 @@ class MySQLDAO() : DBDAO {
         return try {
             this.conn = connect()
             val user: User = this.getUser(email)!!
-            this.conn!!.close()
-            this.conn = null
 
             Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
         } catch(e: Exception) {
@@ -311,6 +309,7 @@ class MySQLDAO() : DBDAO {
 
         return if(this.checkLogin(username, pass)) {
             return try {
+                conn = connect()
                 executeUpdate(QUERY_UPDATE_USERNAME)
                 ServerState.STATE_SUCCESS
             } catch (e: SQLException) {
@@ -332,6 +331,7 @@ class MySQLDAO() : DBDAO {
 
         return if(this.checkLogin(username, oldPass)) {
             return try {
+                conn = connect()
                 executeUpdate(QUERY_UPDATE_PASSWORD)
                 ServerState.STATE_SUCCESS
             } catch (e: SQLException) {
@@ -352,6 +352,7 @@ class MySQLDAO() : DBDAO {
 
         return if(this.checkLogin(user.getUsername(), pass)) {
             return try {
+                conn = connect()
                 executeUpdate(QUERY_UPDATE_EMAIL)
                 ServerState.STATE_SUCCESS
             } catch (e: SQLException) {
@@ -366,98 +367,72 @@ class MySQLDAO() : DBDAO {
     }
 
     override fun getSession(username: String, pass: String): User? {
-        conn = connect()
-
         return if(this.checkLogin(username, pass)) {
+            conn = connect()
             var user = getUser(username)
             conn!!.close()
 
             user
         } else {
-            conn!!.close()
             null
         }
     }
 
     override fun getSession(email: Email, pass: String): User? {
-        conn = connect()
-
         return if(this.checkLogin(email, pass)) {
+            conn = connect()
             var user = getUser(email)
             conn!!.close()
 
             user
         } else {
-            conn!!.close()
             null
         }
     }
 
-    override fun getTeam(username: String, pass: String): String? {
+    override fun getTeam(username: String): String? {
         conn = connect()
+        var team = getUserTeam(username).joinToString(";")
+        conn!!.close()
 
-        return if(this.checkLogin(username, pass)) {
-            var team = getUserTeam(username).joinToString(";")
-            conn!!.close()
-
-            team
-        } else {
-            conn!!.close()
-            null
-        }
+        return team
     }
 
-    override fun getTeam(email: Email, pass: String): String? {
+    override fun getTeam(email: Email): String? {
         conn = connect()
+        var team = getUserTeam(email).joinToString(";")
+        conn!!.close()
 
-        return if(this.checkLogin(email, pass)) {
-            var team = getUserTeam(email).joinToString(";")
-            conn!!.close()
-
-            team
-        } else {
-            conn!!.close()
-            null
-        }
+        return team
     }
 
-    override fun setTeam(username: String, pass: String, team: List<Int>): ServerState {
+    override fun setTeam(username: String, team: List<Int>): ServerState {
         conn = connect()
 
         val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE username = \"${username}\""
 
-        return if(this.checkLogin(username, pass)) {
-            return try {
-                executeUpdate(QUERY_UPDATE_TEAMS)
-                ServerState.STATE_SUCCESS
-            } catch (e: SQLException) {
-                ServerState.STATE_ERROR_DATABASE
-            } finally {
-                conn!!.close()
-            }
-        } else {
+        return try {
+            executeUpdate(QUERY_UPDATE_TEAMS)
+            ServerState.STATE_SUCCESS
+        } catch (e: SQLException) {
+            ServerState.STATE_ERROR_DATABASE
+        } finally {
             conn!!.close()
-            ServerState.STATE_ERROR_PASSWORD
         }
     }
 
-    override fun setTeam(email: Email, pass: String, team: List<Int>): ServerState {
+    override fun setTeam(email: Email, team: List<Int>): ServerState {
         conn = connect()
 
         val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE email = \"${email.toString()}\""
 
-        return if(this.checkLogin(email, pass)) {
-            return try {
-                executeUpdate(QUERY_UPDATE_TEAMS)
-                ServerState.STATE_SUCCESS
-            } catch (e: SQLException) {
-                ServerState.STATE_ERROR_DATABASE
-            } finally {
-                conn!!.close()
-            }
-        } else {
+        return try {
+            executeUpdate(QUERY_UPDATE_TEAMS)
+            ServerState.STATE_SUCCESS
+        } catch (e: SQLException) {
+            ServerState.STATE_ERROR_DATABASE
+        } finally {
             conn!!.close()
-            ServerState.STATE_ERROR_PASSWORD
         }
     }
 }
