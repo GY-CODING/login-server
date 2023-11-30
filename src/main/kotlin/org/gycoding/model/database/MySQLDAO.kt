@@ -27,7 +27,6 @@ class MySQLDAO() : DBDAO {
 
     init {
         Class.forName("com.mysql.cj.jdbc.Driver")
-        conn = connect()
     }
 
 
@@ -66,12 +65,14 @@ class MySQLDAO() : DBDAO {
      */
     @Throws(SQLException::class)
     private fun executeInsert(sql: String) {
+        this.conn = connect()
         val ps: PreparedStatement = conn!!.prepareStatement(sql)
         ps.addBatch()
         conn!!.setAutoCommit(false)
         ps.executeBatch()
         conn!!.setAutoCommit(true)
         ps.close()
+        this.conn!!.close()
     }
 
     /**
@@ -86,12 +87,14 @@ class MySQLDAO() : DBDAO {
     @Throws(SQLException::class)
     private fun executeByteInsert(sql: String, pass: ByteArray, salt: ByteArray) {
         try {
+            this.conn = connect()
             val preparedStatement: PreparedStatement = this.conn!!.prepareStatement(sql)
 
             preparedStatement.setString(1, ByteHexConverter.bytesToHex(pass))
             preparedStatement.setString(2, ByteHexConverter.bytesToHex(salt))
 
             preparedStatement.executeUpdate()
+            this.conn!!.close()
         } catch (e: SQLException) {
             throw e
         }
@@ -104,9 +107,11 @@ class MySQLDAO() : DBDAO {
      */
     @Throws(SQLException::class)
     private fun executeUpdate(sql: String) {
+        this.conn = connect()
         val ps: PreparedStatement = conn!!.prepareStatement(sql)
         ps.executeUpdate()
         ps.close()
+        this.conn!!.close()
     }
 
     /**
@@ -118,8 +123,11 @@ class MySQLDAO() : DBDAO {
      */
     @Throws(SQLException::class)
     private fun executeQuery(sql: String): ResultSet {
+        this.conn = connect()
         val ps: PreparedStatement = conn!!.prepareStatement(sql)
-        return ps.executeQuery()
+        val rs = ps.executeQuery()
+        this.conn!!.close()
+        return rs
     }
 
     /**
