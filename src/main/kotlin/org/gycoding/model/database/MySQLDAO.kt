@@ -14,6 +14,11 @@ import java.sql.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * Objeto de acceso a datos de la base de datos en AWS RDS con MySQL.
+ * @author Iván Vicente Morales
+ * @see <a href="https://aws.amazon.com/es/rds/">Amazon Web Services RDS</a>
+ */
 class MySQLDAO() : DBDAO {
     private var conn: Connection? = null
 
@@ -238,6 +243,8 @@ class MySQLDAO() : DBDAO {
     /* ================# PUBLIC FUNCTIONS #================ */
 
     override public fun checkLogin(user: String, pass: String): Boolean {
+        conn = connect()
+
         return try {
             this.conn = connect()
             val user: User = this.getUser(user)!!
@@ -247,10 +254,14 @@ class MySQLDAO() : DBDAO {
             Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
         } catch(e: Exception) {
             false
+        } finally {
+            conn!!.close()
         }
     }
 
     override public fun checkLogin(email: Email, pass: String): Boolean {
+        conn = connect()
+
         return try {
             this.conn = connect()
             val user: User = this.getUser(email)!!
@@ -260,24 +271,23 @@ class MySQLDAO() : DBDAO {
             Cipher.verifyPassword(pass, user.getSalt(), user.getPass())
         } catch(e: Exception) {
             false
+        } finally {
+            conn!!.close()
         }
     }
 
     @Throws(SQLException::class)
     override public fun signUp(user: User, pass: String): ServerState {
-        this.conn = connect()
+        conn = connect()
+
         val salt: ByteArray = Cipher.generateSalt()
 
         return if(getUser(user.getUsername()) != null) {
-            this.conn!!.close()
-            this.conn = null
-
+            conn!!.close()
             ServerState.STATE_ERROR_USERNAME
         } else {
             return if(getUser(user.getEmail()) != null) {
-                this.conn!!.close()
-                this.conn = null
-
+                conn!!.close()
                 ServerState.STATE_ERROR_EMAIL
             } else {
                 val QUERY_INSERT_USER: String = "INSERT INTO User (username, email, password, salt, role) VALUES (\"${user.getUsername()}\", \"${user.getEmail()}\", ?, ?, \"${user.getRole()}\")"
@@ -288,8 +298,7 @@ class MySQLDAO() : DBDAO {
                 } catch(e: SQLException) {
                     ServerState.STATE_ERROR_DATABASE
                 } finally {
-                    this.conn!!.close()
-                    this.conn = null
+                    conn!!.close()
                 }
             }
         }
@@ -297,7 +306,7 @@ class MySQLDAO() : DBDAO {
 
     @Throws(SQLException::class)
     override fun updateUserUsername(username: String, newUsername: String, pass: String): ServerState {
-        this.conn = connect()
+        conn = connect()
         val QUERY_UPDATE_USERNAME: String = "UPDATE User SET username = \"${newUsername}\" WHERE username = \"${username}\""
 
         return if(this.checkLogin(username, pass)) {
@@ -307,21 +316,17 @@ class MySQLDAO() : DBDAO {
             } catch (e: SQLException) {
                 ServerState.STATE_ERROR_DATABASE
             } finally {
-                this.conn!!.close()
-                this.conn = null
+                conn!!.close()
             }
         } else {
-            this.conn!!.close()
-            this.conn = null
-
+            conn!!.close()
             ServerState.STATE_ERROR_PASSWORD
         }
     }
 
     @Throws(SQLException::class)
     override fun updateUserPassword(username: String, oldPass: String, newPass: String): ServerState {
-        this.conn = connect()
-
+        conn = connect()
         val tempUser: User = this.getUser(username)!!
         val QUERY_UPDATE_PASSWORD: String = "UPDATE User SET password = \"${ByteHexConverter.bytesToHex(Cipher.hashPassword(newPass, tempUser.getSalt()))}\" WHERE username = \"${username}\""
 
@@ -332,20 +337,17 @@ class MySQLDAO() : DBDAO {
             } catch (e: SQLException) {
                 ServerState.STATE_ERROR_DATABASE
             } finally {
-                this.conn!!.close()
-                this.conn = null
+                conn!!.close()
             }
         } else {
-            this.conn!!.close()
-            this.conn = null
-
+            conn!!.close()
             ServerState.STATE_ERROR_PASSWORD
         }
     }
 
     @Throws(SQLException::class)
     override fun updateUserEmail(user: User, pass: String): ServerState {
-        this.conn = connect()
+        conn = connect()
         val QUERY_UPDATE_EMAIL: String = "UPDATE User SET email = \"${user.getEmail()}\" WHERE username = \"${user.getUsername()}\""
 
         return if(this.checkLogin(user.getUsername(), pass)) {
@@ -355,117 +357,107 @@ class MySQLDAO() : DBDAO {
             } catch (e: SQLException) {
                 ServerState.STATE_ERROR_DATABASE
             } finally {
-                this.conn!!.close()
-                this.conn = null
+                conn!!.close()
             }
         } else {
-            this.conn!!.close()
-            this.conn = null
-
+            conn!!.close()
             ServerState.STATE_ERROR_PASSWORD
         }
     }
 
     override fun getSession(username: String, pass: String): User? {
-        this.conn = connect()
+        conn = connect()
 
         return if(this.checkLogin(username, pass)) {
-            val user = this.getUser(username)
-            this.conn!!.close()
-            this.conn = null
+            var user = getUser(username)
+            conn!!.close()
 
             user
         } else {
-            this.conn!!.close()
-            this.conn = null
-
+            conn!!.close()
             null
         }
     }
 
     override fun getSession(email: Email, pass: String): User? {
-        this.conn = connect()
+        conn = connect()
 
         return if(this.checkLogin(email, pass)) {
-            val user = this.getUser(email)
-
-            this.conn!!.close()
-            this.conn = null
+            var user = getUser(email)
+            conn!!.close()
 
             user
         } else {
-            this.conn!!.close()
-            this.conn = null
-
+            conn!!.close()
             null
         }
     }
 
-    override fun getTeam(username: String): String? {
-        this.conn = connect()
+    override fun getTeam(username: String, pass: String): String? {
+        conn = connect()
 
-        return try {
-            val team = this.getUserTeam(username).joinToString(";")
-
-            this.conn!!.close()
-            this.conn = null
+        return if(this.checkLogin(username, pass)) {
+            var team = getUserTeam(username).joinToString(";")
+            conn!!.close()
 
             team
-        } catch(e: Exception) {
-            this.conn!!.close()
-            this.conn = null
-
-            e.printStackTrace()
+        } else {
+            conn!!.close()
             null
         }
     }
 
-    override fun getTeam(email: Email): String? {
-        this.conn = connect()
+    override fun getTeam(email: Email, pass: String): String? {
+        conn = connect()
 
-        return try {
-            val team = this.getUserTeam(email).joinToString(";")
-
-            this.conn!!.close()
-            this.conn = null
+        return if(this.checkLogin(email, pass)) {
+            var team = getUserTeam(email).joinToString(";")
+            conn!!.close()
 
             team
-        } catch(e: Exception){
-            this.conn!!.close()
-            this.conn = null
-
-            e.printStackTrace()
+        } else {
+            conn!!.close()
             null
         }
     }
 
-    override fun setTeam(username: String, team: List<Int>): ServerState {
-        this.conn = connect()
+    override fun setTeam(username: String, pass: String, team: List<Int>): ServerState {
+        conn = connect()
+
         val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE username = \"${username}\""
 
-        return try {
-            executeUpdate(QUERY_UPDATE_TEAMS)
-            ServerState.STATE_SUCCESS
-        } catch (e: SQLException) {
-            ServerState.STATE_ERROR_DATABASE
-        } finally {
-            this.conn!!.close()
-            this.conn = null
+        return if(this.checkLogin(username, pass)) {
+            return try {
+                executeUpdate(QUERY_UPDATE_TEAMS)
+                ServerState.STATE_SUCCESS
+            } catch (e: SQLException) {
+                ServerState.STATE_ERROR_DATABASE
+            } finally {
+                conn!!.close()
+            }
+        } else {
+            conn!!.close()
+            ServerState.STATE_ERROR_PASSWORD
         }
     }
 
-    override fun setTeam(email: Email, team: List<Int>): ServerState {
-        this.conn = connect()
+    override fun setTeam(email: Email, pass: String, team: List<Int>): ServerState {
+        conn = connect()
+
         val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE email = \"${email.toString()}\""
 
-        return try {
-            executeUpdate(QUERY_UPDATE_TEAMS)
-            ServerState.STATE_SUCCESS
-        } catch (e: SQLException) {
-            ServerState.STATE_ERROR_DATABASE
-        } finally {
-            this.conn!!.close()
-            this.conn = null
+        return if(this.checkLogin(email, pass)) {
+            return try {
+                executeUpdate(QUERY_UPDATE_TEAMS)
+                ServerState.STATE_SUCCESS
+            } catch (e: SQLException) {
+                ServerState.STATE_ERROR_DATABASE
+            } finally {
+                conn!!.close()
+            }
+        } else {
+            conn!!.close()
+            ServerState.STATE_ERROR_PASSWORD
         }
     }
 }
