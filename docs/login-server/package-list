@@ -15,6 +15,7 @@ $dokka.location:org.gycoding.controller/AppController/setTeam/#org.gycoding.mode
 $dokka.location:org.gycoding.controller/AppController/signUp/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-app-controller/sign-up.html
 $dokka.location:org.gycoding.controller/AppController/updateUserEmail/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-app-controller/update-user-email.html
 $dokka.location:org.gycoding.controller/AppController/updateUserPassword/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-app-controller/update-user-password.html
+$dokka.location:org.gycoding.controller/AppController/updateUserPasswordForgotten/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-app-controller/update-user-password-forgotten.html
 $dokka.location:org.gycoding.controller/AppController/updateUserUsername/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-app-controller/update-user-username.html
 $dokka.location:org.gycoding.controller/Controller///PointingToDeclaration/login-server/org.gycoding.controller/-controller/index.html
 $dokka.location:org.gycoding.controller/Controller/checkLogin/#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-controller/check-login.html
@@ -28,6 +29,7 @@ $dokka.location:org.gycoding.controller/Controller/setTeam/#org.gycoding.model.d
 $dokka.location:org.gycoding.controller/Controller/signUp/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-controller/sign-up.html
 $dokka.location:org.gycoding.controller/Controller/updateUserEmail/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-controller/update-user-email.html
 $dokka.location:org.gycoding.controller/Controller/updateUserPassword/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-controller/update-user-password.html
+$dokka.location:org.gycoding.controller/Controller/updateUserPasswordForgotten/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-controller/update-user-password-forgotten.html
 $dokka.location:org.gycoding.controller/Controller/updateUserUsername/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.controller/-controller/update-user-username.html
 $dokka.location:org.gycoding.model.data////PointingToDeclaration/login-server/org.gycoding.model.data/index.html
 $dokka.location:org.gycoding.model.data/Email.Companion///PointingToDeclaration/login-server/org.gycoding.model.data/-email/-companion/index.html
@@ -78,6 +80,7 @@ $dokka.location:org.gycoding.model.database/DBDAO/setTeam/#org.gycoding.model.da
 $dokka.location:org.gycoding.model.database/DBDAO/signUp/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-d-b-d-a-o/sign-up.html
 $dokka.location:org.gycoding.model.database/DBDAO/updateUserEmail/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-d-b-d-a-o/update-user-email.html
 $dokka.location:org.gycoding.model.database/DBDAO/updateUserPassword/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-d-b-d-a-o/update-user-password.html
+$dokka.location:org.gycoding.model.database/DBDAO/updateUserPasswordForgotten/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-d-b-d-a-o/update-user-password-forgotten.html
 $dokka.location:org.gycoding.model.database/DBDAO/updateUserUsername/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-d-b-d-a-o/update-user-username.html
 $dokka.location:org.gycoding.model.database/DBFactory///PointingToDeclaration/login-server/org.gycoding.model.database/-d-b-factory/index.html
 $dokka.location:org.gycoding.model.database/DBFactory/MODE_MYSQL/#/PointingToDeclaration/login-server/org.gycoding.model.database/-d-b-factory/-m-o-d-e_-m-y-s-q-l.html
@@ -103,6 +106,7 @@ $dokka.location:org.gycoding.model.database/MySQLDAO/setTeam/#org.gycoding.model
 $dokka.location:org.gycoding.model.database/MySQLDAO/signUp/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-my-s-q-l-d-a-o/sign-up.html
 $dokka.location:org.gycoding.model.database/MySQLDAO/updateUserEmail/#org.gycoding.model.data.User#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-my-s-q-l-d-a-o/update-user-email.html
 $dokka.location:org.gycoding.model.database/MySQLDAO/updateUserPassword/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-my-s-q-l-d-a-o/update-user-password.html
+$dokka.location:org.gycoding.model.database/MySQLDAO/updateUserPasswordForgotten/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-my-s-q-l-d-a-o/update-user-password-forgotten.html
 $dokka.location:org.gycoding.model.database/MySQLDAO/updateUserUsername/#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/login-server/org.gycoding.model.database/-my-s-q-l-d-a-o/update-user-username.html
 $dokka.location:org.gycoding.model.utils////PointingToDeclaration/login-server/org.gycoding.model.utils/index.html
 $dokka.location:org.gycoding.model.utils/ByteHexConverter///PointingToDeclaration/login-server/org.gycoding.model.utils/-byte-hex-converter/index.html
