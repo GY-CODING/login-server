@@ -54,6 +54,13 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
+        get("/update/password-forgotten/{username}/{email}/{newPassword}") {
+            try {
+                call.respondText(appController.updateUserPasswordForgotten(call.parameters["username"]!!, call.parameters["email"]!!, call.parameters["newPassword"]!!).value.toString())
+            } catch(e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message.toString())
+            }
+        }
         get("/team/{user}") {
             try {
                 if(call.parameters["user"]!!.matches(Email.REGEX)) {

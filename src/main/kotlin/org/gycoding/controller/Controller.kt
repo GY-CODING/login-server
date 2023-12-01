@@ -62,6 +62,17 @@ interface Controller {
     fun updateUserPassword(username: String, oldPass: String, newPass: String): ServerState
 
     /**
+     * Modifica la contraseña del usuario si esta ha sido olvidada.
+     * @param username Nombre del usuario.
+     * @param email Email del usuario.
+     * @param newPass Nueva contraseña del usuario.
+     * @return Estado de la modificación de la contraseña del usuario.
+     * @throws SQLException
+     * @author Iván Vicente Morales
+     */
+    fun updateUserPasswordForgotten(username: String, email: String, newPass: String): ServerState
+
+    /**
      * Modifica el email del usuario.
      * @param user
      * @param pass

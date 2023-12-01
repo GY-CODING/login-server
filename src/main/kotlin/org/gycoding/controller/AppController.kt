@@ -65,6 +65,16 @@ class AppController : Controller {
         }
     }
 
+    override fun updateUserPasswordForgotten(username: String, email: String, newPass: String): ServerState {
+        try {
+            return dbDAO!!.updateUserPasswordForgotten(username, email, newPass)
+        } catch(e: NotFoundException) {
+            throw e;
+        } catch(e: SQLException) {
+            throw e;
+        }
+    }
+
     override fun updateUserEmail(user: User, pass: String): ServerState {
         try {
             return dbDAO!!.updateUserEmail(user, pass)

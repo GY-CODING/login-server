@@ -365,6 +365,23 @@ class MySQLDAO() : DBDAO {
     }
 
     @Throws(SQLException::class)
+    override fun updateUserPasswordForgotten(username: String, email: String, newPass: String): ServerState {
+        conn = connect()
+        val tempUser: User = this.getUser(username)!!
+        val QUERY_UPDATE_PASSWORD: String = "UPDATE User SET password = \"${ByteHexConverter.bytesToHex(Cipher.hashPassword(newPass, tempUser.getSalt()))}\" WHERE username = \"${username}\" AND email = \"${email}\""
+
+        return try {
+            conn = connect()
+            executeUpdate(QUERY_UPDATE_PASSWORD)
+            ServerState.STATE_SUCCESS
+        } catch (e: SQLException) {
+            ServerState.STATE_ERROR_DATABASE
+        } finally {
+            conn!!.close()
+        }
+    }
+
+    @Throws(SQLException::class)
     override fun updateUserEmail(user: User, pass: String): ServerState {
         conn = connect()
         val QUERY_UPDATE_EMAIL: String = "UPDATE User SET email = \"${user.getEmail()}\" WHERE username = \"${user.getUsername()}\""
