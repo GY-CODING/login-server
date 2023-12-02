@@ -2,14 +2,14 @@ package org.gycoding.model.utils
 
 /**
  * Conversor bidireccional de bytes y cadenas hexadecimales.
- * @author Iván Vicente Morales
+ * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
  */
 object ByteHexConverter {
     /**
      * Convierte un array de bytes a una cadena hexadecimal.
      * @param bytes Array de bytes.
      * @return Cadena hexadecimal.
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     public fun bytesToHex(bytes: ByteArray): String {
         val stringBuilder = StringBuilder()
@@ -23,7 +23,7 @@ object ByteHexConverter {
      * Convierte una cadena hexadecimal en un array de bytes.
      * @param hex Cadena hexadecimal.
      * @return Array de bytes.
-     * @author Iván Vicente Morales.
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     public fun hexToBytes(hex: String): ByteArray {
         val len = hex.length

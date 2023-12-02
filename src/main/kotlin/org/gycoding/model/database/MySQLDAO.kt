@@ -13,7 +13,7 @@ import java.util.*
 
 /**
  * Objeto de acceso a datos de la base de datos en AWS RDS con MySQL.
- * @author Iván Vicente Morales
+ * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
  * @see <a href="https://aws.amazon.com/es/rds/">Amazon Web Services RDS</a>
  */
 class MySQLDAO() : DBDAO {
@@ -39,7 +39,7 @@ class MySQLDAO() : DBDAO {
      * Conecta a una base de datos.
      * @return Instancia de la conexión.
      * @see Connection
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     fun connect(): Connection? {
         val URL: String             = System.getenv("MYSQL_URL")
@@ -65,7 +65,7 @@ class MySQLDAO() : DBDAO {
      * Ejecuta una inserción en la base de datos.
      * @param sql Sentencia SQL (no admite scripts).
      * @throws SQLException
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(SQLException::class)
     private fun executeInsert(sql: String) {
@@ -84,7 +84,7 @@ class MySQLDAO() : DBDAO {
      * @param salt Sal cifrada asociada al usuario.
      * @throws SQLException
      * @see ByteArray
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(SQLException::class)
     private fun executeByteInsert(sql: String, pass: ByteArray, salt: ByteArray) {
@@ -104,7 +104,7 @@ class MySQLDAO() : DBDAO {
      * Ejecuta una modificación a un registro de la base de datos.
      * @param sql Sentencia SQL (no admite scripts).
      * @throws SQLException
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(SQLException::class)
     private fun executeUpdate(sql: String) {
@@ -119,7 +119,7 @@ class MySQLDAO() : DBDAO {
      * @return Conjunto de resultados que devuelve la consulta.
      * @throws SQLException
      * @see ResultSet
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(SQLException::class)
     private fun executeQuery(sql: String): ResultSet {
@@ -133,7 +133,7 @@ class MySQLDAO() : DBDAO {
      * @return Usuario
      * @throws NotFoundException
      * @see User
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(NotFoundException::class)
     private fun getUser(username: String): User? {
@@ -164,7 +164,7 @@ class MySQLDAO() : DBDAO {
      * @return Usuario
      * @throws NotFoundException
      * @see User
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(NotFoundException::class)
     private fun getUser(email: Email): User? {
@@ -196,7 +196,7 @@ class MySQLDAO() : DBDAO {
      * @throws NotFoundException
      * @see User
      * @see MutableList
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(NotFoundException::class)
     private fun getUserTeam(username: String): MutableList<Int> {
@@ -231,7 +231,7 @@ class MySQLDAO() : DBDAO {
      * @throws NotFoundException
      * @see User
      * @see MutableList
-     * @author Iván Vicente Morales
+     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
      */
     @Throws(NotFoundException::class)
     private fun getUserTeam(email: Email): MutableList<Int> {

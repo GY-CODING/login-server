@@ -4,7 +4,7 @@ package org.gycoding.model.data
  * Representación de un usuario.
  * @param username Nombre del usuario.
  * @param email Email del usuario como objeto.
- * @author Iván Vicente Morales
+ * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
  */
 data class User (
     private var username: String,

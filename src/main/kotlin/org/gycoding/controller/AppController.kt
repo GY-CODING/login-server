@@ -10,7 +10,7 @@ import java.sql.SQLException
 
 /**
  * Controlador de la aplicación.
- * @author Iván Vicente Morales
+ * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
  */
 class AppController : Controller {
     var dbDAO: DBDAO? = null

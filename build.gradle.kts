@@ -39,6 +39,7 @@ ktor {
 tasks {
     val dokkaHtml by getting(DokkaTask::class) {
         outputDirectory.set(buildDir.resolve("../docs"))
+        this.moduleName.set("ToxYc Accounts")
     }
 }
 
