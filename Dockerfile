@@ -8,10 +8,10 @@ ENV KTOR_PORT=8080
 ENV KTOR_IP="0.0.0.0"
 ENV MYSQL_URL="ivm-accounts.ch53lvtsczj2.eu-west-3.rds.amazonaws.com"
 ENV MYSQL_PORT=3306
-ENV MYSQL_DB="ivmaccounts"
-ENV MYSQL_USER="admin"
-ENV MYSQL_PASS="ivmmanager"
+ENV MYSQL_DB="gyaccounts"
+ENV MYSQL_USER="gycoding"
+ENV MYSQL_PASS="gycoding"
 EXPOSE 8080:8080
 RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /app/GYServer.jar
-ENTRYPOINT ["java","-jar","/app/GYServer.jar"]
+ENTRYPOINT ["java","-jar","/app/GYAccounts.jar"]

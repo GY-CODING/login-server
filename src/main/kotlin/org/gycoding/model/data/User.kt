@@ -11,7 +11,7 @@ data class User (
     private var email: Email,
 ) {
     companion object {
-        public val DEFAULT_ROLE: String    = "user"
+        public val DEFAULT_ROLE: String    = "USER"
     }
     
     private var pass: ByteArray?        = null

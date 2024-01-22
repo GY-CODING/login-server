@@ -12,20 +12,13 @@ import java.sql.Connection
 import java.util.*
 
 /**
- * Objeto de acceso a datos de la base de datos en AWS RDS con MySQL.
+ * Objeto de acceso a datos de la base de datos en AWS RDS con Planetscale de MySQL.
  * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
  * @see <a href="https://aws.amazon.com/es/rds/">Amazon Web Services RDS</a>
+ * @see <a href="https://planetscale">Planetscale</a>
  */
 class MySQLDAO() : DBDAO {
     private var conn: Connection? = null
-
-    companion object {
-        val STATE_ERROR_USERNAME: Int   = -3;
-        val STATE_ERROR_EMAIL: Int      = -2;
-        val STATE_ERROR_PASSWORD: Int   = -1;
-        val STATE_ERROR_DATABASE: Int   = 0;
-        val STATE_SUCCESS: Int          = 1;
-    }
 
     init {
         Class.forName("com.mysql.cj.jdbc.Driver")
@@ -189,76 +182,6 @@ class MySQLDAO() : DBDAO {
         }
     }
 
-    /**
-     * Devuelve el equipo de un usuario como una lista mutable de identificadores de cada personaje.
-     * @param username Nombre del usuario.
-     * @return Lista mutable de identificadores de cada personaje del equipo del usuario.
-     * @throws NotFoundException
-     * @see User
-     * @see MutableList
-     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
-     */
-    @Throws(NotFoundException::class)
-    private fun getUserTeam(username: String): MutableList<Int> {
-        val QUERY_USER_TEAM: String      = "SELECT teamElement1, teamElement2, teamElement3, teamElement4, teamElement5, teamElement6, teamElement7, teamElement8 FROM User WHERE username = \"${username}\""
-
-        try {
-            val rs: ResultSet            = this.executeQuery(QUERY_USER_TEAM)
-            var team: MutableList<Int>   = ArrayList<Int>()
-
-            while(rs.next()) {
-                team.add(rs.getInt("teamElement1"))
-                team.add(rs.getInt("teamElement2"))
-                team.add(rs.getInt("teamElement3"))
-                team.add(rs.getInt("teamElement4"))
-                team.add(rs.getInt("teamElement5"))
-                team.add(rs.getInt("teamElement6"))
-                team.add(rs.getInt("teamElement7"))
-                team.add(rs.getInt("teamElement8"))
-            }
-
-            return team
-        } catch(e: Exception) {
-            e.printStackTrace()
-            throw NotFoundException()
-        }
-    }
-
-    /**
-     * Devuelve el equipo de un usuario como una lista mutable de identificadores de cada personaje.
-     * @param email Email del usuario.
-     * @return Lista mutable de identificadores de cada personaje del equipo del usuario.
-     * @throws NotFoundException
-     * @see User
-     * @see MutableList
-     * @author Iván Vicente Morales (<a href="https://github.com/srtoxyc">@srtoxyc</a>)
-     */
-    @Throws(NotFoundException::class)
-    private fun getUserTeam(email: Email): MutableList<Int> {
-        val QUERY_USER_TEAM: String      = "SELECT teamElement1, teamElement2, teamElement3, teamElement4, teamElement5, teamElement6, teamElement7, teamElement8 FROM User WHERE email = \"${email}\""
-
-        try {
-            val rs: ResultSet            = this.executeQuery(QUERY_USER_TEAM)
-            var team: MutableList<Int>   = ArrayList<Int>()
-
-            while(rs.next()) {
-                team.add(rs.getInt("teamElement1"))
-                team.add(rs.getInt("teamElement2"))
-                team.add(rs.getInt("teamElement3"))
-                team.add(rs.getInt("teamElement4"))
-                team.add(rs.getInt("teamElement5"))
-                team.add(rs.getInt("teamElement6"))
-                team.add(rs.getInt("teamElement7"))
-                team.add(rs.getInt("teamElement8"))
-            }
-
-            return team
-        } catch(e: Exception) {
-            e.printStackTrace()
-            throw NotFoundException()
-        }
-    }
-
 
 
     /* ================# PUBLIC FUNCTIONS #================ */
@@ -403,76 +326,6 @@ class MySQLDAO() : DBDAO {
         } else {
             conn!!.close()
             ServerState.STATE_ERROR_PASSWORD
-        }
-    }
-
-    override fun getSession(username: String, pass: String): User? {
-        return if(this.checkLogin(username, pass)) {
-            conn = connect()
-            var user = getUser(username)
-            conn!!.close()
-
-            user
-        } else {
-            null
-        }
-    }
-
-    override fun getSession(email: Email, pass: String): User? {
-        return if(this.checkLogin(email, pass)) {
-            conn = connect()
-            var user = getUser(email)
-            conn!!.close()
-
-            user
-        } else {
-            null
-        }
-    }
-
-    override fun getTeam(username: String): String? {
-        conn = connect()
-        var team = getUserTeam(username).joinToString(";")
-        conn!!.close()
-
-        return team
-    }
-
-    override fun getTeam(email: Email): String? {
-        conn = connect()
-        var team = getUserTeam(email).joinToString(";")
-        conn!!.close()
-
-        return team
-    }
-
-    override fun setTeam(username: String, team: List<Int>): ServerState {
-        conn = connect()
-
-        val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE username = \"${username}\""
-
-        return try {
-            executeUpdate(QUERY_UPDATE_TEAMS)
-            ServerState.STATE_SUCCESS
-        } catch (e: SQLException) {
-            ServerState.STATE_ERROR_DATABASE
-        } finally {
-            conn!!.close()
-        }
-    }
-
-    override fun setTeam(email: Email, team: List<Int>): ServerState {
-        conn = connect()
-
-        val QUERY_UPDATE_TEAMS: String = "UPDATE User SET teamElement1 = ${team[0]}, teamElement2 = ${team[1]}, teamElement3 = ${team[2]}, teamElement4 = ${team[3]}, teamElement5 = ${team[4]}, teamElement6 = ${team[5]}, teamElement7 = ${team[6]}, teamElement8 = ${team[7]} WHERE email = \"${email.toString()}\""
-
-        return try {
-            executeUpdate(QUERY_UPDATE_TEAMS)
-            ServerState.STATE_SUCCESS
-        } catch (e: SQLException) {
-            ServerState.STATE_ERROR_DATABASE
-        } finally {
-            conn!!.close()
         }
     }
 }

@@ -27,11 +27,11 @@ repositories {
 
 ktor {
     fatJar {
-        archiveFileName.set("GYServer.jar")
+        archiveFileName.set("GYAccounts.jar")
     }
     docker {
         jreVersion.set(JavaVersion.VERSION_11)
-        localImageName.set("GYServer")
+        localImageName.set("GYAccounts")
         imageTag.set("v1.0.0")
     }
 }
@@ -39,7 +39,7 @@ ktor {
 tasks {
     val dokkaHtml by getting(DokkaTask::class) {
         outputDirectory.set(buildDir.resolve("../docs"))
-        this.moduleName.set("ToxYc Accounts")
+        this.moduleName.set("GY Accounts")
     }
 }
 

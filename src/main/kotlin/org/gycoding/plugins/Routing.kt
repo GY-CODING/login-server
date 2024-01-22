@@ -61,41 +61,5 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound, e.message.toString())
             }
         }
-        get("/team/{user}") {
-            try {
-                if(call.parameters["user"]!!.matches(Email.REGEX)) {
-                    call.respondText(appController.getTeam(Email(call.parameters["user"]!!)).toString())
-                } else {
-                    call.respondText(appController.getTeam(call.parameters["user"]!!).toString())
-                }
-            } catch(e: NotFoundException) {
-                call.respond(HttpStatusCode.NotFound, e.message.toString())
-            }
-        }
-        get("/team/{user}/{team}") {
-            val DELIM: String = ";"
-
-            try {
-                if(call.parameters["user"]!!.matches(Email.REGEX)) {
-                    call.respondText(appController.setTeam(Email(call.parameters["user"]!!), call.parameters["team"]!!.split(DELIM).map { it.toInt() }).value.toString())
-                } else {
-                    call.respondText(appController.setTeam(call.parameters["user"]!!, call.parameters["team"]!!.split(DELIM).map { it.toInt() }).value.toString())
-                }
-            } catch(e: NotFoundException) {
-                call.respond(HttpStatusCode.NotFound, e.message.toString())
-            }
-        }
-        get("/session/{user}/{password}") {
-            try {
-                if(call.parameters["user"]!!.matches(Email.REGEX)) {
-                    call.respondText(appController.getSession(Email(call.parameters["user"]!!), call.parameters["password"]!!).toString())
-                } else {
-                    call.respondText(appController.getSession(call.parameters["user"]!!, call.parameters["password"]!!).toString())
-                }
-
-            } catch(e: NotFoundException) {
-                call.respond(HttpStatusCode.NotFound, e.message.toString())
-            }
-        }
     }
 }
